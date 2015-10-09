@@ -60,7 +60,7 @@ public class InputMain extends AppCompatActivity implements LocationListener, Vi
         // ボタン1が押された場合
         if (v.getId() == R.id.sendButton) {
             Toast.makeText(this, "ボタンが押されました！", Toast.LENGTH_LONG).show();
-            
+
             Intent intent = new Intent(InputMain.this, ViewActivity.class);
             startActivity(intent);
         }
