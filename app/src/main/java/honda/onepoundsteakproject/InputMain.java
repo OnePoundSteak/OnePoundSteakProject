@@ -12,8 +12,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class InputMain extends AppCompatActivity implements LocationListener{
+public class InputMain extends AppCompatActivity implements LocationListener, View.OnClickListener{
     public final static String EXTRA_MYTIME = "honda.onepoundsteakproject.MYTIME";
     //時間のKey
     public final static String EXTRA_MYMONEY = "honda.onepoundsteakproject.MYMONEY";
@@ -39,88 +40,33 @@ public class InputMain extends AppCompatActivity implements LocationListener{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_input_main);
 
+        // リスナーの登録
+        findViewById(R.id.sendButton).setOnClickListener(this);
+
         mLocationManager = (LocationManager) this.getSystemService(Service.LOCATION_SERVICE);
         getLatLongitude();
     }
 
     /*Buttonをクリックしたときのメソッド
-    EditText(お金、時間を入力する)から入力を受け取る
-    Editable型で受け取るためtoStringメソッドを使い,
-    parseIntでint型で所持する.
-    お金だけが入力されている場合(時間は24時間に設定), 時間だけが入力されている場合(お金は10万円)
-    両方入力されている場合は, Intentを使い次の画面に遷移させる.
-    なにも入力されていない場合はエラー文を出力
-    */
-    public void inputButton(View view) {
-        Intent intent = new Intent(getApplication(), OutputMain.class);
-        int myMoney, myTime;
-        EditText moneyEditText = (EditText) findViewById(R.id.moneyEditText);
-        //idからmoneyEditTextの獲得
-        String stringMoney = moneyEditText.getText().toString();
-        //Editable型からString型に変換し、入力情報を保存
-        if (stringMoney.equals("")) {
-            myMoney = 0;//nullをparseIntするのをふせぐため
-        } else {
-            myMoney = Integer.parseInt(stringMoney);
-        }
-        //String型からint型に変換する。
-        EditText timeEditText = (EditText) findViewById(R.id.timeEditText);
-        //idからtimeEditTextの獲得
-        String stringTime = timeEditText.getText().toString();
-        //Editable型からString型に変換し、入力情報を保存
-        if (stringTime.equals("")) {
-            myTime = 0;
-            //nullをparseIntするのをふせぐため"0"を入れておく
-        } else {
-            myTime = Integer.parseInt(stringTime);
-        }
-        if (myMoney == 0) {
-            if (myTime == 0) {
-                moneyEditText.setError("お金を入力してください");
-                timeEditText.setError("時間を入力してください");
-                //どちらも入力されてない場合の処理
-            } else {
-                myMoney = 100000;
-                //お金が入力されなかった場合は10万円を初期値にする
-                if (latitude != 0) {
-                    intent.putExtra(EXTRA_MYTIME, myTime);
-                    intent.putExtra(EXTRA_MYMONEY, myMoney);
-                    intent.putExtra(EXTRA_MYLONGITUDE, longitude);
-                    intent.putExtra(EXTRA_MYLAITUDE, latitude);
-                    startActivity(intent);
-                    //どちらかの緯度か経度を取ることができれば、その情報をすべてOutputに
-                } else {
-                    //緯度が取得されていれば経度も取得されている
-                    //緯度は日本では0をとらないのでエラー処理
-                    String message = "GPS機能が無効になっています,ONにしてください";
-                    showMessage(message);
-                }
-            }
-        } else if (myTime == 0) {
-            myTime = 1440;//お金が入力されていて時間が入力されていなかったら24時間(1440分)を初期値とする
-            if (latitude != 0) {
-                intent.putExtra(EXTRA_MYTIME, myTime);
-                intent.putExtra(EXTRA_MYMONEY, myMoney);
-                intent.putExtra(EXTRA_MYLONGITUDE, longitude);
-                intent.putExtra(EXTRA_MYLAITUDE, latitude);
-                startActivity(intent);
-            } else {
-                String message = "GPS機能が無効になっています,ONにしてください";
-                showMessage(message);
-            }
-        } else {
-            if (latitude != 0) {
-                intent.putExtra(EXTRA_MYTIME, myTime);
-                intent.putExtra(EXTRA_MYMONEY, myMoney);
-                intent.putExtra(EXTRA_MYLONGITUDE, longitude);
-                intent.putExtra(EXTRA_MYLAITUDE, latitude);
-                startActivity(intent);
-            } else {
-                String message = "GPS機能が無効になっています,ONにしてください";
-                showMessage(message);
-            }
+        EditText(お金、時間を入力する)から入力を受け取る
+        Editable型で受け取るためtoStringメソッドを使い,
+        parseIntでint型で所持する.
+        お金だけが入力されている場合(時間は24時間に設定), 時間だけが入力されている場合(お金は10万円)
+        両方入力されている場合は, Intentを使い次の画面に遷移させる.
+        なにも入力されていない場合はエラー文を出力
+     */
+    @Override
+    public void onClick(View v) {
+        // ボタン1が押された場合
+        if (v.getId() == R.id.sendButton) {
+            Toast.makeText(this, "ボタンが押されました！", Toast.LENGTH_LONG).show();
+            
+            Intent intent = new Intent(InputMain.this, ViewActivity.class);
+            startActivity(intent);
         }
     }
+
+
     /*LocationListenerのオブジェクトからGPSの位置情報を取得するメソッド
     GPSが利用可能な場合は,latitude,longitudeに現在地の緯度、経度を代入する.
     GPSが取得できない場合は,エラー文を出力するようにしている.
