@@ -35,8 +35,9 @@ import java.util.ArrayList;
 public class PreviewActivityFragment extends Fragment {
 
     private static final String TAG = PreviewActivityFragment.class.getSimpleName();
-    private ArrayList<String> mSpotList;
+    private ArrayList<SpotInf> mSpotList;
     private int image = -1;
+    private TextView mSpotNameTextView;
 
     public PreviewActivityFragment() {
     }
@@ -44,7 +45,10 @@ public class PreviewActivityFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //request( (float)34.986047, (float)135.758826, 60);
+
+        mSpotNameTextView = null;
+
+        request((float) 34.986047, (float) 135.758826, 60);
     }
 
     @Override
@@ -52,6 +56,7 @@ public class PreviewActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_preview, container, false);
 
+        mSpotNameTextView = (TextView)view.findViewById(R.id.spotNameText);
         view.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -66,17 +71,38 @@ public class PreviewActivityFragment extends Fragment {
         return view;
     }
 
-    private void setSpotList(ArrayList<String> spotList){
+    private void setSpotList(ArrayList<SpotInf> spotList) {
         mSpotList = spotList;
     }
 
-    /**
-     * リクエスト処理
-     */
+    private ArrayList<SpotInf> parseJSONtoSpotList(JSONObject jsondata){
+        ArrayList<SpotInf> ret = new ArrayList<SpotInf>();
+
+        try {
+            JSONArray spots = jsondata.getJSONArray("spots");
+            for(int i=0; i<spots.length(); i++) {
+                JSONObject spot = spots.getJSONObject(i);
+                ret.add(new SpotInf(
+                        Integer.parseInt(spot.getString("data_id")),
+                        spot.getString("name"),
+                        Float.parseFloat(spot.getString("lon")),
+                        Float.parseFloat(spot.getString("lat")),
+                        Float.parseFloat(spot.getString("rate")),
+                        Float.parseFloat(spot.getString("distance"))));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Log.d("ListSize:", ""+ret.size());
+
+        return ret;
+    }
+
     private void request(float lon, float lat, float time) {
         String tag_json_obj = "json_obj_req";
         String url = "https://gentle-basin-2840.herokuapp.com/place/" + lon + "/" + lat + "/" + time;
-
+        Log.d("Access URL:", url);
         // ロード中表示
         final ProgressDialog pDialog = new ProgressDialog(getActivity());
         pDialog.setMessage("Loading...");
@@ -85,37 +111,32 @@ public class PreviewActivityFragment extends Fragment {
         JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
                 url, null,
                 new Response.Listener<JSONObject>() {
-
                     @Override
                     public void onResponse(JSONObject response) {
-                        ArrayList<String> newSpotList = new ArrayList<String>();
-                        Log.d(TAG, response.toString());
-                        try {
-                            JSONArray spots = response.getJSONArray("spots");
-                            for(int i=0; i<spots.length(); i++) {
-                                newSpotList.add(spots.getJSONObject(i).getString("name"));
-                            }
-                            setSpotList(newSpotList);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                        ArrayList<SpotInf> newSpotList = parseJSONtoSpotList(response);
+                        setSpotList(newSpotList);
+                        Log.d("spotList:", "loading comp!");
+
+                        if(mSpotNameTextView != null && mSpotList.size() != 0){
+                            mSpotNameTextView.setText(mSpotList.get(0).name);
                         }
 
                         pDialog.hide();
                     }
                 }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                VolleyLog.d(TAG, "Error: " + error.getMessage());
-                pDialog.hide();
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        VolleyLog.d(TAG, "Error: " + error.getMessage());
+                        pDialog.hide();
 
-                if( error instanceof NetworkError) {
-                } else if( error instanceof ServerError) {
-                } else if( error instanceof AuthFailureError) {
-                } else if( error instanceof ParseError) {
-                } else if( error instanceof NoConnectionError) {
-                } else if( error instanceof TimeoutError) {
-                }
-            }
+                        if( error instanceof NetworkError) {
+                        } else if( error instanceof ServerError) {
+                        } else if( error instanceof AuthFailureError) {
+                        } else if( error instanceof ParseError) {
+                        } else if( error instanceof NoConnectionError) {
+                        } else if( error instanceof TimeoutError) {
+                        }
+                    }
         });
 
         // シングルトンクラスで実行

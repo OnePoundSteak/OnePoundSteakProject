@@ -9,7 +9,7 @@
     android:background="#FFE455">
 
     <TextView
-        android:id = "@+id/spotTitleText"
+        android:id = "@+id/spotNameText"
         android:text = "ゴウランガ！"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
@@ -18,6 +18,7 @@
         android:id="@+id/button"
         android:text="prev"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/spotNameText"/>
 
 </RelativeLayout>
