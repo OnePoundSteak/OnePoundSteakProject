@@ -18,7 +18,6 @@ public class ViewActivity extends FragmentActivity {
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.add(R.id.contents, fragment);
             fragmentTransaction.commit();
-
         }
 
     }

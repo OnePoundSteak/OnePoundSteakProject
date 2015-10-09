@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 public class ViewActivityFragment extends Fragment {
 
     public ViewActivityFragment() {
+
     }
 
     @Override

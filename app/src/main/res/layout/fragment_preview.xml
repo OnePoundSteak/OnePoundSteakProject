@@ -6,7 +6,13 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="com.example.ain.tabitomo.ViewActivityFragment"
-    android:background="#0004FF">
+    android:background="#FFE455">
+
+    <TextView
+        android:id = "@+id/spotTitleText"
+        android:text = "ゴウランガ！"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
     <Button
         android:id="@+id/button"
