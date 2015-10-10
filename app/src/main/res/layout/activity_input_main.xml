@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".InputMain">
+    tools:context=".InputMain"
+    android:background="#FFE455">
 
     <TextView
         android:gravity="center"
