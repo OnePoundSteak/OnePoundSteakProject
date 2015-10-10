@@ -21,7 +21,9 @@ import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.NetworkImageView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,6 +40,7 @@ public class PreviewActivityFragment extends Fragment {
     private ArrayList<SpotInf> mSpotList;
     private int image = -1;
     private TextView mSpotNameTextView;
+    private NetworkImageView mSpotImageView;
 
     public PreviewActivityFragment() {
     }
@@ -47,6 +50,7 @@ public class PreviewActivityFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         mSpotNameTextView = null;
+        mSpotImageView = null;
 
         request((float) 34.986047, (float) 135.758826, 60);
     }
@@ -57,6 +61,8 @@ public class PreviewActivityFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_preview, container, false);
 
         mSpotNameTextView = (TextView)view.findViewById(R.id.spotNameText);
+        mSpotImageView = (NetworkImageView)view.findViewById(R.id.spotImageView);
+
         view.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -121,6 +127,10 @@ public class PreviewActivityFragment extends Fragment {
                             mSpotNameTextView.setText(mSpotList.get(0).name);
                         }
 
+                        AppController.getInstance().getRequestQueue();
+                        String hogeurl = "http://www.jalan.net/jalan/img/9/spot/0109/KL/26106aa1020109571_1.jpg";
+                        mSpotImageView.setImageUrl(hogeurl, new ImageLoader(AppController.getInstance().getRequestQueue(), new BitmapCache()));
+
                         pDialog.hide();
                     }
                 }, new Response.ErrorListener() {
@@ -165,6 +175,10 @@ public class PreviewActivityFragment extends Fragment {
                         if(mSpotNameTextView != null && mSpotList.size() != 0){
                             mSpotNameTextView.setText(mSpotList.get(0).name);
                         }
+
+                        AppController.getInstance().getRequestQueue();
+                        String hogeurl = "http://www.gundam.info/uploads/image/thumbnail/20120418150816-25907.jpg";
+                        mSpotImageView.setImageUrl(hogeurl, new ImageLoader(AppController.getInstance().getRequestQueue(), new BitmapCache()));
 
                         pDialog.hide();
                     }
