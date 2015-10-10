@@ -45,7 +45,7 @@ public class PreviewActivityFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         mSpotNameTextView = null;
 
         request((float) 34.986047, (float) 135.758826, 60);
@@ -142,4 +142,50 @@ public class PreviewActivityFragment extends Fragment {
         // シングルトンクラスで実行
         AppController.getInstance().addToRequestQueue(jsonObjReq, tag_json_obj);
     }
+
+
+    private void imageRequest() {
+        String tag_json_obj = "json_obj_req";
+        String url = "http://bluemark.info/wp-content/uploads/2013/02/3a4465fcdc9a8bb92e40ac1456d52d6f.jpg";
+        Log.d("Access URL:", url);
+        // ロード中表示
+        final ProgressDialog pDialog = new ProgressDialog(getActivity());
+        pDialog.setMessage("Loading...");
+        pDialog.show();
+
+        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
+                url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        ArrayList<SpotInf> newSpotList = parseJSONtoSpotList(response);
+                        setSpotList(newSpotList);
+                        Log.d("spotList:", "loading comp!");
+
+                        if(mSpotNameTextView != null && mSpotList.size() != 0){
+                            mSpotNameTextView.setText(mSpotList.get(0).name);
+                        }
+
+                        pDialog.hide();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.d(TAG, "Error: " + error.getMessage());
+                pDialog.hide();
+
+                if( error instanceof NetworkError) {
+                } else if( error instanceof ServerError) {
+                } else if( error instanceof AuthFailureError) {
+                } else if( error instanceof ParseError) {
+                } else if( error instanceof NoConnectionError) {
+                } else if( error instanceof TimeoutError) {
+                }
+            }
+        });
+
+        // シングルトンクラスで実行
+        AppController.getInstance().addToRequestQueue(jsonObjReq, tag_json_obj);
+    }
+
 }

@@ -14,8 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-
-
     <TextView
         android:id = "@+id/spotNameText"
         android:text = "観光地名"
@@ -64,7 +62,19 @@
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerInParent="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:text="ほかの場所ない？"
+        android:id="@+id/buttonnnnnnnnn"
+        android:background="@drawable/button_corners"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="20dp"
         android:layout_marginBottom="16dp"/>
 
 </RelativeLayout>
