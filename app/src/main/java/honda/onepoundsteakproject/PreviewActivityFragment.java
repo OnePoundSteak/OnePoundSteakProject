@@ -63,7 +63,7 @@ public class PreviewActivityFragment extends Fragment {
         mLat = getArguments().getDouble("lat");
         mLon = getArguments().getDouble("lon");
 
-        request((float) mLat, (float) mLon, mTime);
+        spotListRequest((float) mLat, (float) mLon, mTime);
     }
 
     @Override
@@ -83,7 +83,17 @@ public class PreviewActivityFragment extends Fragment {
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
             }
+        });
 
+        view.findViewById(R.id.changeSpotButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment fragment = new requestDialogFragment();
+                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.add(R.id.contents, fragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
         });
 
         if(mSpotInf != null){
@@ -126,7 +136,7 @@ public class PreviewActivityFragment extends Fragment {
         return ret;
     }
 
-    private void request(float lon, float lat, float time) {
+    private void spotListRequest(float lon, float lat, float time) {
         String tag_json_obj = "json_obj_req";
         String url = "https://gentle-basin-2840.herokuapp.com/place/" + lon + "/" + lat + "/" + time;
         Log.d("Access URL:", url);
