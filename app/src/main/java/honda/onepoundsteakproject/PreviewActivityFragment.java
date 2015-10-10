@@ -45,7 +45,7 @@ public class PreviewActivityFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        
         mSpotNameTextView = null;
 
         request((float) 34.986047, (float) 135.758826, 60);
