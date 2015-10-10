@@ -31,7 +31,10 @@ public class InputMain extends AppCompatActivity implements LocationListener, Vi
     //おおよその最小距離
     private LocationManager mLocationManager;
     //LocationManager型のインスタンスの定義
-    public double longitude, latitude;
+    private double mLongitude;
+    private double mLatitude;
+    private int mMoney;
+    private int mTime;
 
     //一番初めに呼び出されるメソッド. LocationManager型のオブジェクトを作成
     //getLatLongitude()メソッドの呼び出しを行う
@@ -62,6 +65,15 @@ public class InputMain extends AppCompatActivity implements LocationListener, Vi
             Toast.makeText(this, "ボタンが押されました！", Toast.LENGTH_LONG).show();
 
             Intent intent = new Intent(InputMain.this, ViewActivity.class);
+            // デバッグ用
+            mMoney = 1000;
+            mTime = 60;
+            mLatitude = 34.986047;
+            mLongitude = 135.758826;
+            intent.putExtra("money", mMoney);
+            intent.putExtra("time", mTime);
+            intent.putExtra("lon", mLongitude);
+            intent.putExtra("lat", mLatitude);
             startActivity(intent);
         }
     }
@@ -83,8 +95,8 @@ public class InputMain extends AppCompatActivity implements LocationListener, Vi
             );
             Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             if (location != null) {
-                latitude = location.getLatitude();//緯度を取得する
-                longitude = location.getLongitude();//経度を取得する
+                mLatitude = location.getLatitude();//緯度を取得する
+                mLongitude = location.getLongitude();//経度を取得する
             }
         } else {
             String message = "GPS機能が無効になっています,ONにしてください";

@@ -42,7 +42,10 @@ public class PreviewActivityFragment extends Fragment {
     private SpotInf mSpotInf;
     private String mSpotImageURL;
     private NetworkImageView mSpotImageView;
-
+    private int mMoney;
+    private int mTime;
+    private double mLat;
+    private double mLon;
 
     public PreviewActivityFragment() {
     }
@@ -55,8 +58,12 @@ public class PreviewActivityFragment extends Fragment {
         mSpotNameTextView = null;
         mSpotImageView = null;
         mSpotImageURL="";
+        mMoney = getArguments().getInt("money");
+        mTime = getArguments().getInt("time");
+        mLat = getArguments().getDouble("lat");
+        mLon = getArguments().getDouble("lon");
 
-        request((float) 34.986047, (float) 135.758826, 60);
+        request((float) mLat, (float) mLon, mTime);
     }
 
     @Override
