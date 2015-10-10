@@ -13,8 +13,6 @@ public class ViewActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view);
 
-        Log.d("aaaaaaaaaa>>>>>>>", "");
-
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.contents);
         if(fragment == null){
             fragment = new PreviewActivityFragment();

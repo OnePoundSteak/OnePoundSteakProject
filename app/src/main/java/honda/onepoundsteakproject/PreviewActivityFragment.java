@@ -38,9 +38,11 @@ public class PreviewActivityFragment extends Fragment {
 
     private static final String TAG = PreviewActivityFragment.class.getSimpleName();
     private ArrayList<SpotInf> mSpotList;
-    private int image = -1;
     private TextView mSpotNameTextView;
+    private SpotInf mSpotInf;
+    private String mSpotImageURL;
     private NetworkImageView mSpotImageView;
+
 
     public PreviewActivityFragment() {
     }
@@ -49,8 +51,10 @@ public class PreviewActivityFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mSpotInf = null;
         mSpotNameTextView = null;
         mSpotImageView = null;
+        mSpotImageURL="";
 
         request((float) 34.986047, (float) 135.758826, 60);
     }
@@ -74,6 +78,16 @@ public class PreviewActivityFragment extends Fragment {
             }
 
         });
+
+        if(mSpotInf != null){
+            mSpotNameTextView.setText(mSpotInf.name);
+        }
+
+        if(!mSpotImageURL.equals("")){
+            AppController.getInstance().getRequestQueue();
+            mSpotImageView.setImageUrl(mSpotImageURL, new ImageLoader(AppController.getInstance().getRequestQueue(), new BitmapCache()));
+        }
+
         return view;
     }
 
@@ -100,7 +114,7 @@ public class PreviewActivityFragment extends Fragment {
             e.printStackTrace();
         }
 
-        Log.d("ListSize:", ""+ret.size());
+        Log.d("ListSize:", "" + ret.size());
 
         return ret;
     }
@@ -124,12 +138,13 @@ public class PreviewActivityFragment extends Fragment {
                         Log.d("spotList:", "loading comp!");
 
                         if(mSpotNameTextView != null && mSpotList.size() != 0){
-                            mSpotNameTextView.setText(mSpotList.get(0).name);
+                            mSpotInf = mSpotList.get(0);
+                            mSpotNameTextView.setText(mSpotInf.name);
                         }
 
+                        mSpotImageURL = "http://www.jalan.net/jalan/img/9/spot/0109/KL/26106aa1020109571_1.jpg";
                         AppController.getInstance().getRequestQueue();
-                        String hogeurl = "http://www.jalan.net/jalan/img/9/spot/0109/KL/26106aa1020109571_1.jpg";
-                        mSpotImageView.setImageUrl(hogeurl, new ImageLoader(AppController.getInstance().getRequestQueue(), new BitmapCache()));
+                        mSpotImageView.setImageUrl(mSpotImageURL, new ImageLoader(AppController.getInstance().getRequestQueue(), new BitmapCache()));
 
                         pDialog.hide();
                     }
@@ -147,55 +162,6 @@ public class PreviewActivityFragment extends Fragment {
                         } else if( error instanceof TimeoutError) {
                         }
                     }
-        });
-
-        // シングルトンクラスで実行
-        AppController.getInstance().addToRequestQueue(jsonObjReq, tag_json_obj);
-    }
-
-
-    private void imageRequest() {
-        String tag_json_obj = "json_obj_req";
-        String url = "http://bluemark.info/wp-content/uploads/2013/02/3a4465fcdc9a8bb92e40ac1456d52d6f.jpg";
-        Log.d("Access URL:", url);
-        // ロード中表示
-        final ProgressDialog pDialog = new ProgressDialog(getActivity());
-        pDialog.setMessage("Loading...");
-        pDialog.show();
-
-        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
-                url, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        ArrayList<SpotInf> newSpotList = parseJSONtoSpotList(response);
-                        setSpotList(newSpotList);
-                        Log.d("spotList:", "loading comp!");
-
-                        if(mSpotNameTextView != null && mSpotList.size() != 0){
-                            mSpotNameTextView.setText(mSpotList.get(0).name);
-                        }
-
-                        AppController.getInstance().getRequestQueue();
-                        String hogeurl = "http://www.gundam.info/uploads/image/thumbnail/20120418150816-25907.jpg";
-                        mSpotImageView.setImageUrl(hogeurl, new ImageLoader(AppController.getInstance().getRequestQueue(), new BitmapCache()));
-
-                        pDialog.hide();
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                VolleyLog.d(TAG, "Error: " + error.getMessage());
-                pDialog.hide();
-
-                if( error instanceof NetworkError) {
-                } else if( error instanceof ServerError) {
-                } else if( error instanceof AuthFailureError) {
-                } else if( error instanceof ParseError) {
-                } else if( error instanceof NoConnectionError) {
-                } else if( error instanceof TimeoutError) {
-                }
-            }
         });
 
         // シングルトンクラスで実行

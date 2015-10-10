@@ -11,7 +11,7 @@ public class SpotInf {
 
     public  SpotInf(){
         this.dataId = -1;
-        this.name = "dummy";
+        this.name = "";
         this.lat = 0;
         this.lng = 0;
         this.rate = 0;

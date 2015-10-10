@@ -11,6 +11,53 @@
         android:id="@+id/button"
         android:text="@string/hello_world"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"/>
+
+    <TextView
+        android:background="@drawable/corner_round"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <TextView
+        android:id = "@+id/spotNameText"
+        android:text = "観光地名"
+        android:textSize="25dp"
+        android:textColor="#333333"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"/>
+
+    <com.android.volley.toolbox.NetworkImageView
+        android:id="@+id/spotImageView"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:layout_centerInParent="true"
+        android:layout_below="@+id/spotNameText"
+        android:layout_margin="10dp" />
+
+    <TextView
+        android:id = "@+id/spotTimeText"
+        android:text = "時間：だいたい20分"
+        android:textSize="15dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/spotImageView"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp" />
+
+    <TextView
+        android:id = "@+id/fareTimeText"
+        android:text = "交通費：450円"
+        android:textSize="15dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/spotImageView"
+        android:layout_toRightOf="@+id/spotTimeText"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="20dp" />
+
 
 </RelativeLayout>
