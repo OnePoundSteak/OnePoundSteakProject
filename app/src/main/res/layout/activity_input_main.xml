@@ -4,28 +4,84 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".InputMain"
-    android:background="#FFE455">
+    android:background="#10bea1">
 
     <TextView
         android:gravity="center"
         android:text="@string/string_text"
-        android:layout_weight="1"
         android:layout_width="match_parent"
-        android:layout_height="0dp" />
-    <EditText
-        android:id="@+id/moneyEditText"
-        android:hint="@string/hint1_label"
-        android:layout_weight="3"
+        android:layout_height="wrap_content" />
+
+
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:inputType="number"
-        android:layout_height="0dp" />
-    <EditText
-        android:id="@+id/timeEditText"
-        android:hint="@string/hint2_label"
-        android:layout_weight="3"
+        android:layout_height="98dp"
+        android:orientation="horizontal"
+        android:layout_weight="1.17">
+        <Spinner
+            android:id="@+id/spinner3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#aaaaaa"
+            android:drawSelectorOnTop="true"
+            android:gravity="center"
+            android:text="Spinner1"></Spinner>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="円以内"></TextView>
+
+
+
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:inputType="number"
-        android:layout_height="0dp" />
+        android:layout_height="98dp"
+        android:orientation="horizontal"
+        android:layout_weight="1.17">
+        <Spinner
+            android:id="@+id/spinner1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#aaaaaa"
+            android:drawSelectorOnTop="true"
+            android:gravity="center"
+            android:text="Spinner1"></Spinner>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="時間"></TextView>
+
+        <Spinner
+            android:id="@+id/spinner2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#aaaaaa"
+            android:drawSelectorOnTop="true"
+            android:gravity="center"
+            android:text="Spinner"></Spinner>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="分以内" />
+
+    </LinearLayout>
+
+
     <TextView
         android:id="@+id/message"
         android:layout_weight="1"
