@@ -2,6 +2,7 @@ package honda.onepoundsteakproject;
 
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -31,6 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Timer;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -54,6 +56,7 @@ public class PreviewActivityFragment extends Fragment {
     private Boolean mSpotListLoaded;
     private Boolean mRouteListLoaded;
     private Boolean mImageURLLoaded;
+    private long mStartTime;
 
 
     public PreviewActivityFragment() {
@@ -75,11 +78,13 @@ public class PreviewActivityFragment extends Fragment {
                 getArguments().getInt("money"),
                 getArguments().getInt("time"));
         mpDialog = new ProgressDialog(getActivity());
-        mpDialog.setMessage("Loading...");
+        mpDialog.setCancelable(false);
+        mpDialog.setMessage("検索中です...");
         mpDialog.show();
         mSpotListLoaded = false;
         mRouteListLoaded = false;
         mImageURLLoaded = false;
+        mStartTime = System.currentTimeMillis();
 
         spotListRequest(mUserInf.lon, mUserInf.lat, mUserInf.time);
     }
@@ -102,26 +107,30 @@ public class PreviewActivityFragment extends Fragment {
                 fragmentTransaction.replace(R.id.contents, fragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
+
             }
         });
 
         view.findViewById(R.id.changeSpotButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mSpotList.size() != 0) {
-                    Log.d("行ける！", "");
-                    if(mSelectSpotInf != null){
-                        mCheckedSpotList.add(mSelectSpotInf);
-                    }
-                    mSelectSpotInf = mSpotList.get(0);
-                    mSpotList.remove(0);
+                if ((System.currentTimeMillis() - mStartTime) > 600) {
+                    mStartTime = System.currentTimeMillis();
+                    if (mSpotList.size() != 0) {
+                        Log.d("行ける！", "");
+                        if (mSelectSpotInf != null) {
+                            mCheckedSpotList.add(mSelectSpotInf);
+                        }
+                        mSelectSpotInf = mSpotList.get(0);
+                        mSpotList.remove(0);
 
-                    mRouteListLoaded = false;
-                    mImageURLLoaded = false;
-                    routeListRequest(mUserInf.lon, mUserInf.lat, mSelectSpotInf.lon, mSelectSpotInf.lat);
-                }else{
-                    Log.d("みつからんやで...", "");
-                    Toast.makeText(getActivity(), "見つかりませんでした...", Toast.LENGTH_LONG).show();
+                        mRouteListLoaded = false;
+                        mImageURLLoaded = false;
+                        routeListRequest(mUserInf.lon, mUserInf.lat, mSelectSpotInf.lon, mSelectSpotInf.lat);
+                    } else {
+                        Log.d("みつからんやで...", "");
+                        Toast.makeText(getActivity(), "見つかりませんでした...", Toast.LENGTH_LONG).show();
+                    }
                 }
             }
         });
@@ -309,6 +318,8 @@ public class PreviewActivityFragment extends Fragment {
                         // 画像のロード
                         if (!mSelectSpotInf.imageURL.equals("")) {
                             AppController.getInstance().getRequestQueue();
+                            //mSpotImageView.setDefaultImageResId();
+                            //mSpotImageView.setErrorImageResId();
                             mSpotImageView.setImageUrl(mSelectSpotInf.imageURL, new ImageLoader(AppController.getInstance().getRequestQueue(), new BitmapCache()));
                         }
                         mImageURLLoaded = true;
