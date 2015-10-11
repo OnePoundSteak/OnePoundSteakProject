@@ -37,21 +37,26 @@ import java.util.ArrayList;
 public class PreviewActivityFragment extends Fragment {
     private static final String TAG = PreviewActivityFragment.class.getSimpleName();
     private String API_KEY = "AIzaSyBV6AkKjK5ZUYbU-ntP5-qKhSJMVuSJufY";
-    private ArrayList<SpotInf> mSpotList;
-    private TextView mSpotNameTextView;
-    private TextView mSpotTimeTextView;
-    private TextView mSpotFareTextView;
-    private SpotInf mSpotInf;
-    private String mSpotImageURL;
-    private NetworkImageView mSpotImageView;
+
     private int mMoney;
     private int mTime;
     private double mLat;
     private double mLon;
+
+    private ArrayList<SpotInf> mSpotList;
+    private ArrayList<SpotInf> mCheckedSpotList;
+    private SpotInf mSelectSpotInf;
+
+    private TextView mSpotNameTextView;
+    private TextView mSpotTimeTextView;
+    private TextView mSpotFareTextView;
+    private ProgressDialog mpDialog;
+    private NetworkImageView mSpotImageView;
+
     private Boolean mSpotListLoaded;
     private Boolean mRouteListLoaded;
     private Boolean mImageURLLoaded;
-    private ProgressDialog mpDialog;
+
 
     public PreviewActivityFragment() {
     }
@@ -60,14 +65,13 @@ public class PreviewActivityFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mSpotInf = null;
+        mSelectSpotInf = null;
 
         mSpotNameTextView = null;
         mSpotImageView = null;
         mSpotTimeTextView = null;
         mSpotFareTextView = null;
 
-        mSpotImageURL = "";
         mMoney = getArguments().getInt("money");
         mTime = getArguments().getInt("time");
         mLon = getArguments().getDouble("lon");
@@ -115,15 +119,16 @@ public class PreviewActivityFragment extends Fragment {
             }
         });
 
-        if (mSpotInf != null) {
-            mSpotNameTextView.setText(mSpotInf.name);
-        }
+        if (mSelectSpotInf != null) {
+            mSpotNameTextView.setText(mSelectSpotInf.name);
+            mSpotTimeTextView.setText(mSelectSpotInf.duration + "分");
+            mSpotFareTextView.setText(mSelectSpotInf.fare + "円");
 
-        if (!mSpotImageURL.equals("")) {
-            AppController.getInstance().getRequestQueue();
-            mSpotImageView.setImageUrl(mSpotImageURL, new ImageLoader(AppController.getInstance().getRequestQueue(), new BitmapCache()));
+            if (!mSelectSpotInf.imageURL.equals("")) {
+                AppController.getInstance().getRequestQueue();
+                mSpotImageView.setImageUrl(mSelectSpotInf.imageURL, new ImageLoader(AppController.getInstance().getRequestQueue(), new BitmapCache()));
+            }
         }
-
         return view;
     }
 
@@ -145,11 +150,11 @@ public class PreviewActivityFragment extends Fragment {
 
                         if (mSpotNameTextView != null && mSpotList.size() != 0) {
                             // 本用はソートするべき
-                            mSpotInf = mSpotList.get(15);
+                            mSelectSpotInf = mSpotList.get(15);
                         }
 
                         // 経路情報の取得
-                        routeListRequest(mLat, mLon, mSpotInf.lat, mSpotInf.lon);
+                        routeListRequest(mLat, mLon, mSelectSpotInf.lat, mSelectSpotInf.lon);
 
                         mSpotListLoaded = true;
                         if (mSpotListLoaded && mRouteListLoaded && mImageURLLoaded) {
@@ -197,25 +202,26 @@ public class PreviewActivityFragment extends Fragment {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        ArrayList<RouteInf> newRouteList = parseJSONtoRouteList(response);
+                        ArrayList<RouteInf> routeList = parseJSONtoRouteList(response);
                         Log.d("spotList:", "loading comp!");
-                        Log.d(">>>>>>>", newRouteList.get(0).distance + ", "
-                                + newRouteList.get(0).duration + ", "
-                                + newRouteList.get(0).fare + ", "
-                                + newRouteList.get(0).startLat + ", "
-                                + newRouteList.get(0).startLon + ", "
-                                + newRouteList.get(0).endLat + ", "
-                                + newRouteList.get(0).endLon);
-
+                        Log.d(">>>>>>>", routeList .get(0).distance + ", "
+                                + routeList.get(0).duration + ", "
+                                + routeList.get(0).fare + ", "
+                                + routeList.get(0).startLat + ", "
+                                + routeList.get(0).startLon + ", "
+                                + routeList.get(0).endLat + ", "
+                                + routeList.get(0).endLon);
+                        // TODO 平均値にするなりなんなり
+                        mSelectSpotInf.fare = routeList .get(0).fare;
+                        mSelectSpotInf.duration = routeList .get(0).duration;
                         mRouteListLoaded = true;
 
                         // 画面に適用
-                        mSpotNameTextView.setText(mSpotInf.name); // TODO 修正しなきゃ
-                        mSpotFareTextView.setText(newRouteList.get(0).fare + "円");
-                        mSpotTimeTextView.setText(newRouteList.get(0).duration + "分");
+                        mSpotNameTextView.setText(mSelectSpotInf.name);
+                        mSpotFareTextView.setText(mSelectSpotInf.fare + "円");
+                        mSpotTimeTextView.setText(mSelectSpotInf.duration + "分");
 
-                        // TODO!!!!!!!!!!!
-                        imgURLRequest(mSpotInf.name);
+                        imgURLRequest(mSelectSpotInf.name);
 
                         if (mSpotListLoaded && mRouteListLoaded && mImageURLLoaded) {
                             mpDialog.hide();
@@ -261,12 +267,12 @@ public class PreviewActivityFragment extends Fragment {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.d("よんだ", "いめーじぱーさー");
-                        String imgURL = parseJSONtoImageURL(response);
+                        mSelectSpotInf.imageURL = parseJSONtoImageURL(response);
                         Log.d("imgURL:", "loading comp!");
                         // 画像のロード
-                        if(!imgURL.equals("")) {
+                        if(!mSelectSpotInf.imageURL.equals("")) {
                             AppController.getInstance().getRequestQueue();
-                            mSpotImageView.setImageUrl(imgURL, new ImageLoader(AppController.getInstance().getRequestQueue(), new BitmapCache()));
+                            mSpotImageView.setImageUrl(mSelectSpotInf.imageURL, new ImageLoader(AppController.getInstance().getRequestQueue(), new BitmapCache()));
                         }
                         mImageURLLoaded = true;
 
@@ -361,7 +367,7 @@ public class PreviewActivityFragment extends Fragment {
     }
 
     private String parseJSONtoImageURL(JSONObject jsondata) {
-        String ret = ""; // TODO 検索できなかった場合を考えておくべき
+        String ret = "";
 
         try {
             JSONObject item = jsondata.getJSONArray("items").getJSONObject(0);
