@@ -38,10 +38,7 @@ public class PreviewActivityFragment extends Fragment {
     private static final String TAG = PreviewActivityFragment.class.getSimpleName();
     private String API_KEY = "AIzaSyBV6AkKjK5ZUYbU-ntP5-qKhSJMVuSJufY";
 
-    private int mMoney;
-    private int mTime;
-    private double mLat;
-    private double mLon;
+    private UserInf mUserInf;
 
     private ArrayList<SpotInf> mSpotList;
     private ArrayList<SpotInf> mCheckedSpotList;
@@ -72,10 +69,12 @@ public class PreviewActivityFragment extends Fragment {
         mSpotTimeTextView = null;
         mSpotFareTextView = null;
 
-        mMoney = getArguments().getInt("money");
-        mTime = getArguments().getInt("time");
-        mLon = getArguments().getDouble("lon");
-        mLat = getArguments().getDouble("lat");
+        mUserInf = new UserInf(
+                getArguments().getDouble("lon"),
+                getArguments().getDouble("lat"),
+                getArguments().getInt("money"),
+                getArguments().getInt("time"));
+
         mpDialog = new ProgressDialog(getActivity());
         mpDialog.setMessage("Loading...");
         mpDialog.show();
@@ -84,7 +83,7 @@ public class PreviewActivityFragment extends Fragment {
         mRouteListLoaded = false;
         mImageURLLoaded = false;
 
-        spotListRequest(mLat, mLon, mTime);
+        spotListRequest(mUserInf.lon, mUserInf.lat, mUserInf.time);
     }
 
     @Override
@@ -133,7 +132,7 @@ public class PreviewActivityFragment extends Fragment {
     }
 
 
-    private void spotListRequest(double lat, double lon, float time) {
+    private void spotListRequest(double lon, double lat, float time) {
         String tag_json_obj = "json_obj_req";
         String url = "https://gentle-basin-2840.herokuapp.com/place/" + lat + "/" + lon + "/" + time;
         Log.d("Access URL:", url);
@@ -154,7 +153,7 @@ public class PreviewActivityFragment extends Fragment {
                         }
 
                         // 経路情報の取得
-                        routeListRequest(mLat, mLon, mSelectSpotInf.lat, mSelectSpotInf.lon);
+                        routeListRequest(mUserInf.lon, mUserInf.lat, mSelectSpotInf.lon, mSelectSpotInf.lat);
 
                         mSpotListLoaded = true;
                         if (mSpotListLoaded && mRouteListLoaded && mImageURLLoaded) {
@@ -181,7 +180,7 @@ public class PreviewActivityFragment extends Fragment {
         AppController.getInstance().addToRequestQueue(jsonObjReq, tag_json_obj);
     }
 
-    private void routeListRequest(double orgLat, double orgLon, double destLat, double destLon) {
+    private void routeListRequest(double orgLon, double orgLat, double destLon, double destLat) {
         String tag_json_obj = "DirectionJson_obj_req";
         String url = "https://maps.googleapis.com/maps/api/directions/json?" +
                 "origin=" + orgLat + "," + orgLon +
@@ -204,7 +203,7 @@ public class PreviewActivityFragment extends Fragment {
                     public void onResponse(JSONObject response) {
                         ArrayList<RouteInf> routeList = parseJSONtoRouteList(response);
                         Log.d("spotList:", "loading comp!");
-                        Log.d(">>>>>>>", routeList .get(0).distance + ", "
+                        Log.d(">>>>>>>", routeList.get(0).distance + ", "
                                 + routeList.get(0).duration + ", "
                                 + routeList.get(0).fare + ", "
                                 + routeList.get(0).startLat + ", "
@@ -212,8 +211,8 @@ public class PreviewActivityFragment extends Fragment {
                                 + routeList.get(0).endLat + ", "
                                 + routeList.get(0).endLon);
                         // TODO 平均値にするなりなんなり
-                        mSelectSpotInf.fare = routeList .get(0).fare;
-                        mSelectSpotInf.duration = routeList .get(0).duration;
+                        mSelectSpotInf.fare = routeList.get(0).fare;
+                        mSelectSpotInf.duration = routeList.get(0).duration;
                         mRouteListLoaded = true;
 
                         // 画面に適用
@@ -247,7 +246,7 @@ public class PreviewActivityFragment extends Fragment {
         AppController.getInstance().addToRequestQueue(jsonObjReq, tag_json_obj);
     }
 
-    private void imgURLRequest(String keyword){
+    private void imgURLRequest(String keyword) {
         String tag_json_obj = "imgSearch_obj_req";
         String url = "https://www.googleapis.com/customsearch/v1?"
                 + "key=" + API_KEY
@@ -270,13 +269,13 @@ public class PreviewActivityFragment extends Fragment {
                         mSelectSpotInf.imageURL = parseJSONtoImageURL(response);
                         Log.d("imgURL:", "loading comp!");
                         // 画像のロード
-                        if(!mSelectSpotInf.imageURL.equals("")) {
+                        if (!mSelectSpotInf.imageURL.equals("")) {
                             AppController.getInstance().getRequestQueue();
                             mSpotImageView.setImageUrl(mSelectSpotInf.imageURL, new ImageLoader(AppController.getInstance().getRequestQueue(), new BitmapCache()));
                         }
                         mImageURLLoaded = true;
 
-                        if(mSpotListLoaded && mRouteListLoaded && mImageURLLoaded) {
+                        if (mSpotListLoaded && mRouteListLoaded && mImageURLLoaded) {
                             mpDialog.hide();
                         }
                     }
@@ -286,12 +285,12 @@ public class PreviewActivityFragment extends Fragment {
                 VolleyLog.d(TAG, "Error: " + error.getMessage());
                 mpDialog.hide(); // TODO ここもしっかり書き分けるべき
 
-                if( error instanceof NetworkError) {
-                } else if( error instanceof ServerError) {
-                } else if( error instanceof AuthFailureError) {
-                } else if( error instanceof ParseError) {
-                } else if( error instanceof NoConnectionError) {
-                } else if( error instanceof TimeoutError) {
+                if (error instanceof NetworkError) {
+                } else if (error instanceof ServerError) {
+                } else if (error instanceof AuthFailureError) {
+                } else if (error instanceof ParseError) {
+                } else if (error instanceof NoConnectionError) {
+                } else if (error instanceof TimeoutError) {
                 }
             }
         });

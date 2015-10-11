@@ -1,7 +1,5 @@
 package honda.onepoundsteakproject;
 
-import java.util.ArrayList;
-
 public class SpotInf {
     public int dataId;
 	public String name;
@@ -13,7 +11,7 @@ public class SpotInf {
     public int duration;
     public int fare;
 
-	public  SpotInf(int dataId, String name,  float lon, float lat, float rate, float dist){
+	public SpotInf(int dataId, String name,  float lon, float lat, float rate, float dist){
         this.dataId = dataId;
         this.name = name;
         this.lat = lat;
