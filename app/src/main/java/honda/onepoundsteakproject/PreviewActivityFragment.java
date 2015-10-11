@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
@@ -62,23 +63,20 @@ public class PreviewActivityFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mCheckedSpotList = new ArrayList();
         mSelectSpotInf = null;
-
         mSpotNameTextView = null;
         mSpotImageView = null;
         mSpotTimeTextView = null;
         mSpotFareTextView = null;
-
         mUserInf = new UserInf(
                 getArguments().getDouble("lon"),
                 getArguments().getDouble("lat"),
                 getArguments().getInt("money"),
                 getArguments().getInt("time"));
-
         mpDialog = new ProgressDialog(getActivity());
         mpDialog.setMessage("Loading...");
         mpDialog.show();
-
         mSpotListLoaded = false;
         mRouteListLoaded = false;
         mImageURLLoaded = false;
@@ -89,7 +87,7 @@ public class PreviewActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_preview, container, false);
+        final View view = inflater.inflate(R.layout.fragment_preview, container, false);
 
         mSpotNameTextView = (TextView) view.findViewById(R.id.spotNameText);
         mSpotTimeTextView = (TextView) view.findViewById(R.id.spotTimeText);
@@ -110,11 +108,21 @@ public class PreviewActivityFragment extends Fragment {
         view.findViewById(R.id.changeSpotButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Fragment fragment = new RequestDialogFragment();
-                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                fragmentTransaction.add(R.id.contents, fragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
+                if (mSpotList.size() != 0) {
+                    Log.d("行ける！", "");
+                    if(mSelectSpotInf != null){
+                        mCheckedSpotList.add(mSelectSpotInf);
+                    }
+                    mSelectSpotInf = mSpotList.get(0);
+                    mSpotList.remove(0);
+
+                    mRouteListLoaded = false;
+                    mImageURLLoaded = false;
+                    routeListRequest(mUserInf.lon, mUserInf.lat, mSelectSpotInf.lon, mSelectSpotInf.lat);
+                }else{
+                    Log.d("みつからんやで...", "");
+                    Toast.makeText(getActivity(), "見つかりませんでした...", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -147,13 +155,23 @@ public class PreviewActivityFragment extends Fragment {
                         mSpotList = parseJSONtoSpotList(response);
                         Log.d("spotList:", "loading comp!");
 
-                        if (mSpotNameTextView != null && mSpotList.size() != 0) {
-                            // 本用はソートするべき
-                            mSelectSpotInf = mSpotList.get(15);
-                        }
+                        if (mSpotList.size() != 0) {
+                            if(mSelectSpotInf != null){
+                                mCheckedSpotList.add(mSelectSpotInf);
+                            }
+                            mSelectSpotInf = mSpotList.get(0);
+                            mSpotList.remove(0);
 
-                        // 経路情報の取得
-                        routeListRequest(mUserInf.lon, mUserInf.lat, mSelectSpotInf.lon, mSelectSpotInf.lat);
+                            // 経路情報の取得
+                            routeListRequest(mUserInf.lon, mUserInf.lat, mSelectSpotInf.lon, mSelectSpotInf.lat);
+                        }else{
+                            // みつかりませんでした
+                            mSpotNameTextView.setText("ごめんなさい。見つかりませんでした。");
+                            mSpotFareTextView.setText("");
+                            mSpotTimeTextView.setText("");
+                            mSelectSpotInf = null;
+                            // TODO: 画像を削除
+                        }
 
                         mSpotListLoaded = true;
                         if (mSpotListLoaded && mRouteListLoaded && mImageURLLoaded) {
@@ -203,28 +221,48 @@ public class PreviewActivityFragment extends Fragment {
                     public void onResponse(JSONObject response) {
                         ArrayList<RouteInf> routeList = parseJSONtoRouteList(response);
                         Log.d("spotList:", "loading comp!");
-                        Log.d(">>>>>>>", routeList.get(0).distance + ", "
-                                + routeList.get(0).duration + ", "
-                                + routeList.get(0).fare + ", "
-                                + routeList.get(0).startLat + ", "
-                                + routeList.get(0).startLon + ", "
-                                + routeList.get(0).endLat + ", "
-                                + routeList.get(0).endLon);
-                        // TODO 平均値にするなりなんなり
+
                         mSelectSpotInf.fare = routeList.get(0).fare;
                         mSelectSpotInf.duration = routeList.get(0).duration;
+                        // TODO
+                        for(int i=1; i<routeList.size(); i++){
+                            if(mSelectSpotInf.fare > routeList.get(i).fare){
+                                mSelectSpotInf.fare = routeList.get(i).fare;
+                            }
+                            if(mSelectSpotInf.duration > routeList.get(i).duration){
+                                mSelectSpotInf.duration = routeList.get(i).duration;
+                            }
+                        }
                         mRouteListLoaded = true;
 
-                        // 画面に適用
-                        mSpotNameTextView.setText(mSelectSpotInf.name);
-                        mSpotFareTextView.setText(mSelectSpotInf.fare + "円");
-                        mSpotTimeTextView.setText(mSelectSpotInf.duration + "分");
+                        if( mSelectSpotInf.fare > mUserInf.money && mSelectSpotInf.duration > mUserInf.time){
+                            // 条件を満たしていない
+                            Log.d("みたして", "いない");
+                            if(mSpotList.size() != 0) {
+                                mSelectSpotInf = mSpotList.get(0);
+                                mSpotList.remove(0);
+                                // 再度、検索をかける
+                                routeListRequest(mUserInf.lon, mUserInf.lat, mSelectSpotInf.lon, mSelectSpotInf.lat);
 
-                        imgURLRequest(mSelectSpotInf.name);
-
-                        if (mSpotListLoaded && mRouteListLoaded && mImageURLLoaded) {
-                            mpDialog.hide();
+                            }else{
+                                // みつかりませんでした
+                                mSpotNameTextView.setText("ごめんなさい。見つかりませんでした。");
+                                mSpotFareTextView.setText("");
+                                mSpotTimeTextView.setText("");
+                                mSelectSpotInf = null;
+                                // TODO: 画像を削除
+                            }
+                        }else{
+                            // 条件を満たしている
+                            mSpotNameTextView.setText(mSelectSpotInf.name);
+                            mSpotFareTextView.setText(mSelectSpotInf.fare + "円");
+                            mSpotTimeTextView.setText(mSelectSpotInf.duration + "分");
+                            imgURLRequest(mSelectSpotInf.name);
+                            if (mSpotListLoaded && mRouteListLoaded && mImageURLLoaded) {
+                                mpDialog.hide();
+                            }
                         }
+
                     }
                 }, new Response.ErrorListener() {
             @Override
