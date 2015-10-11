@@ -1,0 +1,80 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="honda.onepoundsteakproject.ViewActivityFragment"
+    android:background="#FFE455">
+
+    <TextView
+        android:background="@drawable/corner_round"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <TextView
+        android:id = "@+id/spotNameText"
+        android:text = "観光地名"
+        android:textSize="25dp"
+        android:textColor="#333333"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"/>
+
+    <com.android.volley.toolbox.NetworkImageView
+        android:id="@+id/spotImageView"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:layout_centerInParent="true"
+        android:layout_below="@+id/spotNameText"
+        android:layout_margin="10dp" />
+
+    <TextView
+        android:id = "@+id/spotTimeText"
+        android:text = "時間：だいたい20分"
+        android:textSize="15dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/spotImageView"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp" />
+
+    <TextView
+        android:id = "@+id/fareTimeText"
+        android:text = "交通費：450円"
+        android:textSize="15dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/spotImageView"
+        android:layout_toRightOf="@+id/spotTimeText"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="20dp" />
+
+    <Button
+        android:text="この場所に行く"
+        android:id="@+id/button"
+        android:background="@drawable/button_corners"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:text="ほかの場所ない？"
+        android:id="@+id/changeSpotButton"
+        android:background="@drawable/button_corners"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="16dp"/>
+
+
+
+</RelativeLayout>

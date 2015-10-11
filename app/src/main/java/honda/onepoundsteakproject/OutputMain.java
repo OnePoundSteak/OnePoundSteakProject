@@ -62,11 +62,11 @@ public class OutputMain extends AppCompatActivity {
         latitude4=list.get(3).lat;
         latitude5=list.get(4).lat;
 
-        longitude1=list.get(0).lng;
-        longitude2=list.get(1).lng;
-        longitude3=list.get(2).lng;
-        longitude4=list.get(3).lng;
-        longitude5=list.get(4).lng;
+        longitude1=list.get(0).lon;
+        longitude2=list.get(1).lon;
+        longitude3=list.get(2).lon;
+        longitude4=list.get(3).lon;
+        longitude5=list.get(4).lon;
 
     }
     //    private ArrayList getSortList(int myTime, int myMoney, double mylaitude, double mylongitude) {

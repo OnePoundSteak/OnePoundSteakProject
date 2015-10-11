@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".InputMain">
+    tools:context=".InputMain"
+    android:background="#FFE455">
 
     <TextView
         android:gravity="center"
@@ -32,7 +33,6 @@
         android:layout_height="0dp" />
     <Button
         android:id="@+id/sendButton"
-        android:onClick="inputButton"
         android:hint="@string/button_label"
         android:layout_weight="2"
         android:layout_width="match_parent"
