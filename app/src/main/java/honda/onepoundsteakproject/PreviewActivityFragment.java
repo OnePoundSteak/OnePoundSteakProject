@@ -39,6 +39,9 @@ public class PreviewActivityFragment extends Fragment {
     private static final String TAG = PreviewActivityFragment.class.getSimpleName();
     private ArrayList<SpotInf> mSpotList;
     private TextView mSpotNameTextView;
+    private TextView mSpotTimeTextView;
+    private TextView mSpotFareTextView;
+
     private SpotInf mSpotInf;
     private String mSpotImageURL;
     private NetworkImageView mSpotImageView;
@@ -46,6 +49,9 @@ public class PreviewActivityFragment extends Fragment {
     private int mTime;
     private double mLat;
     private double mLon;
+    private Boolean mSpotListLoaded;
+    private Boolean mRouteListLoaded;
+    private ProgressDialog mpDialog;
 
     public PreviewActivityFragment() {
     }
@@ -55,15 +61,25 @@ public class PreviewActivityFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         mSpotInf = null;
+
         mSpotNameTextView = null;
         mSpotImageView = null;
+        mSpotTimeTextView = null;
+        mSpotFareTextView = null;
+
         mSpotImageURL="";
         mMoney = getArguments().getInt("money");
         mTime = getArguments().getInt("time");
         mLon = getArguments().getDouble("lon");
         mLat = getArguments().getDouble("lat");
+        mpDialog = new ProgressDialog(getActivity());
+        mpDialog.setMessage("Loading...");
+        mpDialog.show();
 
-        spotListRequest((float) mLat, (float) mLon, mTime);
+        mSpotListLoaded = false;
+        mRouteListLoaded = false;
+
+        spotListRequest(mLat, mLon, mTime);
     }
 
     @Override
@@ -72,6 +88,8 @@ public class PreviewActivityFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_preview, container, false);
 
         mSpotNameTextView = (TextView)view.findViewById(R.id.spotNameText);
+        mSpotTimeTextView = (TextView)view.findViewById(R.id.spotTimeText);
+        mSpotFareTextView = (TextView)view.findViewById(R.id.spotFareText);
         mSpotImageView = (NetworkImageView)view.findViewById(R.id.spotImageView);
 
         view.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
@@ -108,10 +126,6 @@ public class PreviewActivityFragment extends Fragment {
         return view;
     }
 
-    private void setSpotList(ArrayList<SpotInf> spotList) {
-        mSpotList = spotList;
-    }
-
     private ArrayList<SpotInf> parseJSONtoSpotList(JSONObject jsondata){
         ArrayList<SpotInf> ret = new ArrayList<SpotInf>();
 
@@ -136,7 +150,50 @@ public class PreviewActivityFragment extends Fragment {
         return ret;
     }
 
-    private void spotDirectionRequest(double orgLat, double orgLon, double destLat, double destLon){
+    private ArrayList<RouteInf> parseJSONtoRouteList(JSONObject jsondata){
+        ArrayList<RouteInf> ret = new ArrayList();
+        // stateでOKかどうかも確認したほうがいいかも
+        try {
+            JSONArray routes = jsondata.getJSONArray("routes");
+
+            for(int i=0; i<routes.length(); i++) {
+                JSONObject route = routes.getJSONObject(i);
+                JSONArray legs = route.getJSONArray("legs");
+                JSONObject leg = legs.getJSONObject(0);
+                JSONArray steps = leg.getJSONArray("steps");
+                JSONObject step = steps.getJSONObject(0);
+                // --
+                JSONObject distance = step.getJSONObject("distance");
+                JSONObject duration = step.getJSONObject("duration");
+                int fare;
+                if(step.has("fare")){
+                    fare = step.getJSONObject("fare").getInt("value");
+                }else{
+                    fare = 0;
+                }
+                JSONObject startLoc = step.getJSONObject("start_location");
+                JSONObject endLoc = step.getJSONObject("end_location");
+                // --
+                ret.add(new RouteInf(
+                        distance.getDouble("value")/1000, // mで返されているのでkmに換算
+                        duration.getInt("value")/60, // 秒で返されているので分に換算
+                        fare,
+                        startLoc.getDouble("lat"),
+                        startLoc.getDouble("lng"),
+                        endLoc.getDouble("lat"),
+                        endLoc.getDouble("lng")));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Log.d("ListSize:", "" + ret.size());
+
+        return ret;
+    }
+
+    private void directionRequest(double orgLat, double orgLon, double destLat, double destLon){
+        String tag_json_obj = "DirectionJson_obj_req";
         String API_KEY = "AIzaSyBV6AkKjK5ZUYbU-ntP5-qKhSJMVuSJufY";
         String url = "https://maps.googleapis.com/maps/api/directions/json?"+
                 "origin=" + orgLat +"," + orgLon +
@@ -148,6 +205,60 @@ public class PreviewActivityFragment extends Fragment {
                 "&units=metric" +
                 "&departure_time=" + "now";
         Log.d("Access URL:", url);
+
+        // ロード中表示
+        mpDialog.show();
+
+        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
+                url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("よんだ", "ぱーさー");
+                        ArrayList<RouteInf> newRouteList = parseJSONtoRouteList(response);
+                        Log.d("spotList:", "loading comp!");
+                        Log.d(">>>>>>>", newRouteList.get(0).distance + ", "
+                                + newRouteList.get(0).duration + ", "
+                                + newRouteList.get(0).fare + ", "
+                                + newRouteList.get(0).startLat + ", "
+                                + newRouteList.get(0).startLon + ", "
+                                + newRouteList.get(0).endLat + ", "
+                                + newRouteList.get(0).endLon);
+
+                        mRouteListLoaded = true;
+
+                        // 画面に適用
+                        mSpotNameTextView.setText(mSpotInf.name); // TODO 修正しなきゃ
+                        mSpotFareTextView.setText(newRouteList.get(0).fare+"円");
+                        mSpotTimeTextView.setText(newRouteList.get(0).duration+"分");
+
+                        // 画像のロード
+                        mSpotImageURL = "http://www.jalan.net/jalan/img/9/spot/0109/KL/26106aa1020109571_1.jpg";
+                        AppController.getInstance().getRequestQueue();
+                        mSpotImageView.setImageUrl(mSpotImageURL, new ImageLoader(AppController.getInstance().getRequestQueue(), new BitmapCache()));
+
+                        if(mSpotListLoaded && mRouteListLoaded) {
+                            mpDialog.hide();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.d(TAG, "Error: " + error.getMessage());
+                mpDialog.hide(); // TODO ここもしっかり書き分けるべき
+
+                if( error instanceof NetworkError) {
+                } else if( error instanceof ServerError) {
+                } else if( error instanceof AuthFailureError) {
+                } else if( error instanceof ParseError) {
+                } else if( error instanceof NoConnectionError) {
+                } else if( error instanceof TimeoutError) {
+                }
+            }
+        });
+
+        // シングルトンクラスで実行
+        AppController.getInstance().addToRequestQueue(jsonObjReq, tag_json_obj);
     }
 
     private void spotListRequest(double lat, double lon, float time) {
@@ -155,39 +266,34 @@ public class PreviewActivityFragment extends Fragment {
         String url = "https://gentle-basin-2840.herokuapp.com/place/" + lat + "/" + lon + "/" + time;
         Log.d("Access URL:", url);
         // ロード中表示
-        final ProgressDialog pDialog = new ProgressDialog(getActivity());
-        pDialog.setMessage("Loading...");
-        pDialog.show();
+        mpDialog.show();
 
         JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
                 url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        ArrayList<SpotInf> newSpotList = parseJSONtoSpotList(response);
-                        setSpotList(newSpotList);
+                        mSpotList = parseJSONtoSpotList(response);
                         Log.d("spotList:", "loading comp!");
 
                         if(mSpotNameTextView != null && mSpotList.size() != 0){
                             // 本用はソートするべき
-                            mSpotInf = mSpotList.get(5);
-                            mSpotNameTextView.setText(mSpotInf.name);
+                            mSpotInf = mSpotList.get(10);
                         }
 
-                        SpotInf tmpSpotInf = mSpotInf;
-                        spotDirectionRequest(mLat, mLon, tmpSpotInf.lat, tmpSpotInf.lon); // 入れ子になるね
+                        // 経路情報の取得
+                        directionRequest(mLat, mLon, mSpotInf.lat, mSpotInf.lon);
 
-                        mSpotImageURL = "http://www.jalan.net/jalan/img/9/spot/0109/KL/26106aa1020109571_1.jpg";
-                        AppController.getInstance().getRequestQueue();
-                        mSpotImageView.setImageUrl(mSpotImageURL, new ImageLoader(AppController.getInstance().getRequestQueue(), new BitmapCache()));
-
-                        pDialog.hide();
+                        mSpotListLoaded = true;
+                        if(mSpotListLoaded && mRouteListLoaded) {
+                            mpDialog.hide();
+                        }
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         VolleyLog.d(TAG, "Error: " + error.getMessage());
-                        pDialog.hide();
+                        mpDialog.hide(); // TODO ここもしっかり書き分けるべき
 
                         if( error instanceof NetworkError) {
                         } else if( error instanceof ServerError) {
