@@ -1,6 +1,5 @@
 package honda.onepoundsteakproject;
 
-
 public class SpotInf {
     public int dataId;
 	public String name;
@@ -8,22 +7,19 @@ public class SpotInf {
     public float lon;
     public float rate;
     public float dist;
+    public String imageURL;
+    public int duration;
+    public int fare;
 
-    public  SpotInf(){
-        this.dataId = -1;
-        this.name = "";
-        this.lat = 0;
-        this.lon = 0;
-        this.rate = 0;
-        this.dist = 0;
-    }
-
-	public  SpotInf(int dataId, String name,  float lon, float lat, float rate, float dist){
+	public SpotInf(int dataId, String name,  float lon, float lat, float rate, float dist){
         this.dataId = dataId;
         this.name = name;
         this.lat = lat;
         this.lon = lon;
         this.rate = rate;
         this.dist = dist;
+        this.imageURL = "";
+        this.duration = -1;
+        this.fare = -1;
     }
 }
