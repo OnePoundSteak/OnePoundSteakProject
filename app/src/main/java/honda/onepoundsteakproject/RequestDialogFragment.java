@@ -13,9 +13,9 @@ import android.widget.Button;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class requestDialogFragment extends Fragment {
+public class RequestDialogFragment extends Fragment {
 
-    public requestDialogFragment() {
+    public RequestDialogFragment() {
 
     }
 
@@ -32,9 +32,9 @@ public class requestDialogFragment extends Fragment {
 
         Button button = (Button)view.findViewById(R.id.otherReqButton);
 
-        button.setOnClickListener(new View.OnClickListener(){
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 getFragmentManager().popBackStack();
             }
         });
