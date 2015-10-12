@@ -20,6 +20,8 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
         android:screenOrientation="portrait">
+        <!-- googleMapAPI -->
+        <uses-library android:name="com.google.android.maps"></uses-library>
         <activity
             android:name=".InputMain"
             android:label="@string/app_name" >
