@@ -47,7 +47,7 @@ public class InputMain extends AppCompatActivity implements LocationListener, Vi
 	//時間、分、お金のspinner
     private String spinnerTime1[] = {"3", "2", "1", "0"};
 	//一つ目のスピナーの要素(何時間以内か)
-    private String spinnerTime2[] = {"0", "10", "20", "30", "40", "50", "60"};
+    private String spinnerTime2[] = {"0", "10", "20", "30", "40", "50"};
 	//二つ目のスピナーの要素(何分以内か)
     private String spinnerMoney[] = {"気にしない", "500", "1000", "2000", "3000", "4000", "5000"};
 	//三つ目のスピナーの要素(お金)
