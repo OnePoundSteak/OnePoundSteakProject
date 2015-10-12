@@ -212,8 +212,8 @@ public class InputMain extends AppCompatActivity implements LocationListener, Vi
             mMoney = getmMoney();
             mTime = getTime1()*60+getTime2();
             //スピナーで取得してきた時間を分に直しmTimeに格納
-			mLatitude = 34.986047;
-            mLongitude = 135.758826;
+			//mLatitude = 34.986047;
+            //mLongitude = 135.758826;
 			//KEYとそれぞれの変数を次のactivityに渡す
             intent.putExtra("money", mMoney);
             intent.putExtra("time", mTime);
