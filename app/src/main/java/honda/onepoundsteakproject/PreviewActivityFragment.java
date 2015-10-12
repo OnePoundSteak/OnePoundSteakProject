@@ -2,7 +2,9 @@ package honda.onepoundsteakproject;
 
 
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -31,6 +33,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Timer;
 
@@ -43,8 +47,11 @@ public class PreviewActivityFragment extends Fragment {
 
     private UserInf mUserInf;
 
+    //検索で絞ったリスト
     private ArrayList<SpotInf> mSpotList;
+    //履歴用のリスト
     private ArrayList<SpotInf> mCheckedSpotList;
+    //現在表示しているもの
     private SpotInf mSelectSpotInf;
 
     private TextView mSpotNameTextView;
@@ -108,6 +115,19 @@ public class PreviewActivityFragment extends Fragment {
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
 
+                /*
+                GoogleMapとの連携
+                 */
+                try{
+                    Uri uri = Uri.parse(
+                            "geo:0.0?q=" + mSelectSpotInf.lat + "," + mSelectSpotInf.lon
+                    );
+                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    startActivity(intent);
+                }catch (ActivityNotFoundException e){
+                    //アプリがなかったときのエラー処理
+                    //Toast.makeText(getActivity(), "画像がないです", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
