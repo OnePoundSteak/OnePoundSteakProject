@@ -29,14 +29,39 @@
         android:layout_marginTop="10dp"
         android:layout_marginStart="10dp"/>
 
+    <TextView
+        android:id = "@+id/subText"
+        android:text = "はどうでしょうか？"
+        android:textSize="13dp"
+        android:textColor="#333333"
+        android:layout_below="@+id/spotNameText"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="25dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"/>
+
     <com.android.volley.toolbox.NetworkImageView
         android:id="@+id/spotImageView"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:background="#FFFFFF"
         android:layout_centerInParent="true"
-        android:layout_below="@+id/spotNameText"
+        android:layout_below="@+id/subText"
         android:layout_margin="10dp" />
+
+    <TextView
+        android:id = "@+id/subText2"
+        android:text = "ここから、大体"
+        android:textSize="13dp"
+        android:textColor="#333333"
+        android:layout_below="@+id/spotImageView"
+        android:layout_alignStart="@+id/mainback"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"/>
 
     <TextView
         android:id = "@+id/spotTimeText"
@@ -44,10 +69,10 @@
         android:textSize="15sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/spotImageView"
+        android:layout_below="@+id/subText2"
         android:layout_alignStart="@+id/mainback"
         android:layout_marginTop="10dp"
-        android:layout_marginStart="10dp" />
+        android:layout_marginStart="20dp" />
 
     <TextView
         android:id = "@+id/spotFareText"
@@ -55,10 +80,23 @@
         android:textSize="15sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/spotImageView"
+        android:layout_below="@+id/subText2"
         android:layout_toRightOf="@+id/spotTimeText"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="20dp" />
+
+    <TextView
+        android:id = "@+id/subText3"
+        android:text = "で行くことができます。"
+        android:textSize="13dp"
+        android:textColor="#333333"
+        android:layout_below="@+id/spotFareText"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="25dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"/>
 
     <LinearLayout
         android:layout_width="fill_parent"
