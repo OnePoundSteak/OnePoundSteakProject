@@ -164,8 +164,8 @@ public class PreviewActivityFragment extends Fragment {
 
         if (mSelectSpotInf != null) {
             mSpotNameTextView.setText(mSelectSpotInf.name);
-            mSpotTimeTextView.setText(mSelectSpotInf.duration + "分");
-            mSpotFareTextView.setText(mSelectSpotInf.fare + "円");
+            mSpotTimeTextView.setText("移動時間:" + mSelectSpotInf.duration + "分");
+            mSpotFareTextView.setText("交通費："+mSelectSpotInf.fare + "円");
 
             if (!mSelectSpotInf.imageURL.equals("")) {
                 AppController.getInstance().getRequestQueue();
@@ -324,8 +324,8 @@ public class PreviewActivityFragment extends Fragment {
                             } else {
                                 // 条件を満たしている
                                 mSpotNameTextView.setText(mSelectSpotInf.name);
-                                mSpotFareTextView.setText(mSelectSpotInf.fare + "円");
-                                mSpotTimeTextView.setText(mSelectSpotInf.duration + "分");
+                                mSpotFareTextView.setText("交通費："+mSelectSpotInf.fare + "円");
+                                mSpotTimeTextView.setText("移動時間："+mSelectSpotInf.duration + "分");
                                 imgURLRequest(mSelectSpotInf.name);
                                 mRouteListLoaded = true;
                                 if (mSpotListLoaded && mRouteListLoaded && mImageURLLoaded) {
