@@ -14,10 +14,10 @@ public class ViewActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view);
 
-        int money = 1;
-        int time = 120;
-        double latitude = 34.986047;
-        double longitude = 135.758826;
+        int money = 0;
+        int time = 0;
+        double latitude = 0;
+        double longitude = 0;
 
         Intent intent = getIntent();
         if(intent != null && intent.hasExtra("money")) {

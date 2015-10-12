@@ -63,7 +63,9 @@ public class PreviewActivityFragment extends Fragment {
     private Boolean mSpotListLoaded;
     private Boolean mRouteListLoaded;
     private Boolean mImageURLLoaded;
+    private Boolean mLoading;
     private long mStartTime;
+    private ImageLoader mImageLoader;
 
 
     public PreviewActivityFragment() {
@@ -84,14 +86,17 @@ public class PreviewActivityFragment extends Fragment {
                 getArguments().getDouble("lat"),
                 getArguments().getInt("money"),
                 getArguments().getInt("time"));
+
         mpDialog = new ProgressDialog(getActivity());
         mpDialog.setCancelable(false);
         mpDialog.setMessage("検索中です...");
-        mpDialog.show();
         mSpotListLoaded = false;
         mRouteListLoaded = false;
         mImageURLLoaded = false;
+        mLoading = false;
         mStartTime = System.currentTimeMillis();
+
+        mImageLoader = new ImageLoader(AppController.getInstance().getRequestQueue(), new BitmapCache());
 
         spotListRequest(mUserInf.lon, mUserInf.lat, mUserInf.time);
     }
@@ -105,6 +110,8 @@ public class PreviewActivityFragment extends Fragment {
         mSpotTimeTextView = (TextView) view.findViewById(R.id.spotTimeText);
         mSpotFareTextView = (TextView) view.findViewById(R.id.spotFareText);
         mSpotImageView = (NetworkImageView) view.findViewById(R.id.spotImageView);
+        mSpotImageView.setDefaultImageResId(android.R.drawable.spinner_background);
+        mSpotImageView.setErrorImageResId(android.R.drawable.ic_dialog_alert);
 
         view.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -173,8 +180,14 @@ public class PreviewActivityFragment extends Fragment {
         String tag_json_obj = "json_obj_req";
         String url = "https://gentle-basin-2840.herokuapp.com/place/" + lat + "/" + lon + "/" + time;
         Log.d("Access URL:", url);
-        // ロード中表示
-        mpDialog.show();
+        // TODO ロード中表示
+        if(!mLoading) {
+            mpDialog.show();
+            mLoading = true;
+        }
+        mSpotListLoaded = false;
+        mRouteListLoaded = false;
+        mImageURLLoaded = false;
 
         JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
                 url, null,
@@ -205,6 +218,7 @@ public class PreviewActivityFragment extends Fragment {
                         mSpotListLoaded = true;
                         if (mSpotListLoaded && mRouteListLoaded && mImageURLLoaded) {
                             mpDialog.hide();
+                            mLoading = false;
                         }
                     }
                 }, new Response.ErrorListener() {
@@ -241,7 +255,12 @@ public class PreviewActivityFragment extends Fragment {
         Log.d("Access URL:", url);
 
         // ロード中表示
-        mpDialog.show();
+        if(!mLoading) {
+            mpDialog.show();
+            mLoading = true;
+        }
+        mRouteListLoaded = false;
+        mImageURLLoaded = false;
 
         JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
                 url, null,
@@ -249,30 +268,16 @@ public class PreviewActivityFragment extends Fragment {
                     @Override
                     public void onResponse(JSONObject response) {
                         ArrayList<RouteInf> routeList = parseJSONtoRouteList(response);
-                        Log.d("spotList:", "loading comp!");
+                        Log.d("routeList:", ""+routeList.size());
 
-                        mSelectSpotInf.fare = routeList.get(0).fare;
-                        mSelectSpotInf.duration = routeList.get(0).duration;
-                        // TODO
-                        for(int i=1; i<routeList.size(); i++){
-                            if(mSelectSpotInf.fare > routeList.get(i).fare){
-                                mSelectSpotInf.fare = routeList.get(i).fare;
-                            }
-                            if(mSelectSpotInf.duration > routeList.get(i).duration){
-                                mSelectSpotInf.duration = routeList.get(i).duration;
-                            }
-                        }
-                        mRouteListLoaded = true;
-
-                        if( mSelectSpotInf.fare > mUserInf.money && mSelectSpotInf.duration > mUserInf.time){
-                            // 条件を満たしていない
-                            Log.d("みたして", "いない");
+                        // 一件も見つからなかった時
+                        if(routeList.size() == 0){
+                            Log.d("ルートが一件も", "みつからん");
                             if(mSpotList.size() != 0) {
                                 mSelectSpotInf = mSpotList.get(0);
                                 mSpotList.remove(0);
                                 // 再度、検索をかける
                                 routeListRequest(mUserInf.lon, mUserInf.lat, mSelectSpotInf.lon, mSelectSpotInf.lat);
-
                             }else{
                                 // みつかりませんでした
                                 mSpotNameTextView.setText("ごめんなさい。見つかりませんでした。");
@@ -282,13 +287,51 @@ public class PreviewActivityFragment extends Fragment {
                                 // TODO: 画像を削除
                             }
                         }else{
-                            // 条件を満たしている
-                            mSpotNameTextView.setText(mSelectSpotInf.name);
-                            mSpotFareTextView.setText(mSelectSpotInf.fare + "円");
-                            mSpotTimeTextView.setText(mSelectSpotInf.duration + "分");
-                            imgURLRequest(mSelectSpotInf.name);
-                            if (mSpotListLoaded && mRouteListLoaded && mImageURLLoaded) {
-                                mpDialog.hide();
+                            // TODO
+                            mSelectSpotInf.fare = routeList.get(0).fare;
+                            mSelectSpotInf.duration = routeList.get(0).duration;
+                            for (int i = 1; i < routeList.size(); i++) {
+                                if (mSelectSpotInf.fare > routeList.get(i).fare) {
+                                    mSelectSpotInf.fare = routeList.get(i).fare;
+                                }
+                                if (mSelectSpotInf.duration > routeList.get(i).duration) {
+                                    mSelectSpotInf.duration = routeList.get(i).duration;
+                                }
+                            }
+                            mRouteListLoaded = true;
+
+                            if (mSelectSpotInf.fare > mUserInf.money && mSelectSpotInf.duration > mUserInf.time) {
+                                // 条件を満たしていない
+                                Log.d("みたして", "いない");
+                                if (mSpotList.size() != 0) {
+                                    mSelectSpotInf = mSpotList.get(0);
+                                    mSpotList.remove(0);
+                                    // 再度、検索をかける
+                                    routeListRequest(mUserInf.lon, mUserInf.lat, mSelectSpotInf.lon, mSelectSpotInf.lat);
+                                } else {
+                                    // みつかりませんでした
+                                    mSpotNameTextView.setText("ごめんなさい。見つかりませんでした。");
+                                    mSpotFareTextView.setText("");
+                                    mSpotTimeTextView.setText("");
+                                    mSelectSpotInf = null;
+                                    // TODO: 画像を削除
+                                    mRouteListLoaded = true;
+                                    if (mSpotListLoaded && mRouteListLoaded && mImageURLLoaded) {
+                                        mpDialog.hide();
+                                        mLoading = false;
+                                    }
+                                }
+                            } else {
+                                // 条件を満たしている
+                                mSpotNameTextView.setText(mSelectSpotInf.name);
+                                mSpotFareTextView.setText(mSelectSpotInf.fare + "円");
+                                mSpotTimeTextView.setText(mSelectSpotInf.duration + "分");
+                                imgURLRequest(mSelectSpotInf.name);
+                                mRouteListLoaded = true;
+                                if (mSpotListLoaded && mRouteListLoaded && mImageURLLoaded) {
+                                    mpDialog.hide();
+                                    mLoading = false;
+                                }
                             }
                         }
 
@@ -297,7 +340,6 @@ public class PreviewActivityFragment extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.d(TAG, "Error: " + error.getMessage());
-                mpDialog.hide(); // TODO ここもしっかり書き分けるべき
 
                 if (error instanceof NetworkError) {
                 } else if (error instanceof ServerError) {
@@ -315,6 +357,10 @@ public class PreviewActivityFragment extends Fragment {
 
     private void imgURLRequest(String keyword) {
         String tag_json_obj = "imgSearch_obj_req";
+        // スペースは「%20」へ置換する
+        keyword = keyword.replace(" ", "%20");
+        keyword = keyword.replace("　", "%20");
+        //keyword.replace("", "%20");
         String url = "https://www.googleapis.com/customsearch/v1?"
                 + "key=" + API_KEY
                 + "&cx=" + "004164534463101160377:waf7n6e8twc"
@@ -324,8 +370,14 @@ public class PreviewActivityFragment extends Fragment {
                 + "&q=" + keyword;
         Log.d("Access URL:", url);
 
+
+
         // ロード中表示
-        mpDialog.show();
+        if(!mLoading) {
+            mpDialog.show();
+            mLoading = true;
+        }
+        mImageURLLoaded = false;
 
         JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
                 url, null,
@@ -338,14 +390,17 @@ public class PreviewActivityFragment extends Fragment {
                         // 画像のロード
                         if (!mSelectSpotInf.imageURL.equals("")) {
                             AppController.getInstance().getRequestQueue();
-                            //mSpotImageView.setDefaultImageResId();
-                            //mSpotImageView.setErrorImageResId();
-                            mSpotImageView.setImageUrl(mSelectSpotInf.imageURL, new ImageLoader(AppController.getInstance().getRequestQueue(), new BitmapCache()));
+                            //
+                            mSpotImageView.setImageUrl(mSelectSpotInf.imageURL, mImageLoader);
+                            //new ImageLoader(AppController.getInstance().getRequestQueue(), new BitmapCache())
+
+                            // 画像取得処理
+                            //imageLoader.get(mSelectSpotInf.imageURL, ImageLoader.getImageListener(mSpotImageView, R.drawable.loadingimage, R.drawable.errorimage));
                         }
                         mImageURLLoaded = true;
-
                         if (mSpotListLoaded && mRouteListLoaded && mImageURLLoaded) {
                             mpDialog.hide();
+                            mLoading = false;
                         }
                     }
                 }, new Response.ErrorListener() {
@@ -394,27 +449,30 @@ public class PreviewActivityFragment extends Fragment {
 
     private ArrayList<RouteInf> parseJSONtoRouteList(JSONObject jsondata) {
         ArrayList<RouteInf> ret = new ArrayList();
+
         // stateでOKかどうかも確認したほうがいいかも
         try {
             JSONArray routes = jsondata.getJSONArray("routes");
 
             for (int i = 0; i < routes.length(); i++) {
+                Log.d("", "11111");
                 JSONObject route = routes.getJSONObject(i);
                 JSONArray legs = route.getJSONArray("legs");
                 JSONObject leg = legs.getJSONObject(0);
-                JSONArray steps = leg.getJSONArray("steps");
-                JSONObject step = steps.getJSONObject(0);
+                //JSONArray steps = leg.getJSONArray("steps");
+                //JSONObject step = steps.getJSONObject(0);
                 // --
-                JSONObject distance = step.getJSONObject("distance");
-                JSONObject duration = step.getJSONObject("duration");
+                Log.d("", "2222");
+                JSONObject distance = leg.getJSONObject("distance");
+                JSONObject duration = leg.getJSONObject("duration");
                 int fare;
-                if (step.has("fare")) {
-                    fare = step.getJSONObject("fare").getInt("value");
+                if (leg.has("fare")) {
+                    fare = leg.getJSONObject("fare").getInt("value");
                 } else {
                     fare = 0;
                 }
-                JSONObject startLoc = step.getJSONObject("start_location");
-                JSONObject endLoc = step.getJSONObject("end_location");
+                JSONObject startLoc = leg.getJSONObject("start_location");
+                JSONObject endLoc = leg.getJSONObject("end_location");
                 // --
                 ret.add(new RouteInf(
                         distance.getDouble("value") / 1000, // mで返されているのでkmに換算
@@ -430,7 +488,9 @@ public class PreviewActivityFragment extends Fragment {
         }
 
         Log.d("ListSize:", "" + ret.size());
-
+        if(ret.size()!=0) {
+            Log.d("", "RET!!" + ret.get(0).fare);
+        }
         return ret;
     }
 
