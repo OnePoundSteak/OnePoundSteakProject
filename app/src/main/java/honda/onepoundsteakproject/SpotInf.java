@@ -1,6 +1,5 @@
 package honda.onepoundsteakproject;
 
-// tes
 public class SpotInf {
     public int dataId;
 	public String name;

@@ -10,7 +10,6 @@ import android.app.Application;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
@@ -42,6 +41,7 @@ public class AppController extends Application {
 
         return mRequestQueue;
     }
+
 
     public <T> void addToRequestQueue(JsonObjectRequest req, String tag) {
         // set the default tag if tag is empty
