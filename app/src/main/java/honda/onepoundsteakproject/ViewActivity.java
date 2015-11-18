@@ -1,6 +1,8 @@
 package honda.onepoundsteakproject;
 
+import android.app.Service;
 import android.content.Intent;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -8,7 +10,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 
 public class ViewActivity extends FragmentActivity {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,22 +31,11 @@ public class ViewActivity extends FragmentActivity {
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.contents);
         if(fragment == null){
             fragment = new InputFragment();
-//            fragment = new PreviewActivityFragment();
-//            Bundle args = new Bundle();
-//            args.putInt("money", money);
-//            args.putInt("time", time);
-//            args.putDouble("lon", longitude);
-//            args.putDouble("lat", latitude);
-//            fragment.setArguments(args);
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.add(R.id.contents, fragment);
             fragmentTransaction.commit();
         }
 
-    }
-
-    public int gethoge(){
-        return -1;
     }
 
 }
