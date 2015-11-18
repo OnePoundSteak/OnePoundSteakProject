@@ -24,6 +24,7 @@
     <TextView
         android:id = "@+id/inputSuggest"
         android:gravity="center"
+        android:textSize="15sp"
         android:text="@string/string_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -41,7 +42,8 @@
         android:layout_below="@+id/inputSuggest"
         android:layout_marginTop="35dp"
         android:layout_alignStart="@+id/mainback"
-        android:baselineAligned="true">
+        android:baselineAligned="true"
+        android:gravity="center">
         <Spinner
             android:id="@+id/spinner3"
             android:layout_marginLeft="15dp"
@@ -74,7 +76,8 @@
         android:orientation="horizontal"
         android:layout_below="@+id/inputMoney"
         android:layout_marginTop="35dp"
-        android:layout_alignStart="@+id/mainback">
+        android:layout_alignStart="@+id/mainback"
+        android:gravity="center">
         <Spinner
             android:id="@+id/spinner1"
             android:layout_width="wrap_content"
@@ -126,8 +129,8 @@
         android:hint="@string/button_label"
         android:layout_height="wrap_content"
         android:layout_marginTop="45dp"
-        android:layout_marginLeft="25dp"
-        android:layout_marginRight="25dp"
+        android:layout_marginLeft="45dp"
+        android:layout_marginRight="45dp"
         android:layout_width="fill_parent"
         android:layout_weight="1"
         android:background="#FFD85A" />

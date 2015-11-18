@@ -45,9 +45,9 @@ public class InputMain extends AppCompatActivity implements LocationListener, Vi
 	//最終的に送る時間(分)
     private Spinner time1Spinner, time2Spinner, moneySpinner;
 	//時間、分、お金のspinner
-    private String spinnerTime1[] = {"3", "2", "1", "0"};
+    private String spinnerTime1[] = {"0", "1", "2", "3"};
 	//一つ目のスピナーの要素(何時間以内か)
-    private String spinnerTime2[] = {"0", "10", "20", "30", "40", "50"};
+    private String spinnerTime2[] = {"0", "10", "20", "30", "40", "50", "60"};
 	//二つ目のスピナーの要素(何分以内か)
     private String spinnerMoney[] = {"気にしない", "500", "1000", "2000", "3000", "4000", "5000"};
 	//三つ目のスピナーの要素(お金)
@@ -212,8 +212,8 @@ public class InputMain extends AppCompatActivity implements LocationListener, Vi
             mMoney = getmMoney();
             mTime = getTime1()*60+getTime2();
             //スピナーで取得してきた時間を分に直しmTimeに格納
-			//mLatitude = 34.986047;
-            //mLongitude = 135.758826;
+			mLatitude = 34.986047;
+            mLongitude = 135.758826;
 			//KEYとそれぞれの変数を次のactivityに渡す
             intent.putExtra("money", mMoney);
             intent.putExtra("time", mTime);

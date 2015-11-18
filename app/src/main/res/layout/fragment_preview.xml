@@ -31,7 +31,7 @@
 
     <TextView
         android:id = "@+id/subText"
-        android:text = "はどうでしょうか？"
+        android:text = "はどうかモ？"
         android:textSize="13dp"
         android:textColor="#333333"
         android:layout_below="@+id/spotNameText"
@@ -65,7 +65,7 @@
 
     <TextView
         android:id = "@+id/spotTimeText"
-        android:text = "時間：だいたい20分"
+        android:text = ""
         android:textSize="15sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -76,7 +76,7 @@
 
     <TextView
         android:id = "@+id/spotFareText"
-        android:text = "交通費：450円"
+        android:text = ""
         android:textSize="15sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -87,7 +87,7 @@
 
     <TextView
         android:id = "@+id/subText3"
-        android:text = "で行くことができます。"
+        android:text = "で行くことができるモ〜"
         android:textSize="13dp"
         android:textColor="#333333"
         android:layout_below="@+id/spotFareText"
@@ -103,7 +103,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_above="@+id/cow"
-        android:layout_alignStart="@+id/mainback">
+        android:layout_alignStart="@+id/mainback"
+        android:layout_alignEnd="@+id/mainback">
         <Button
             android:text="この場所に行く"
             android:id="@+id/button"
@@ -118,9 +119,9 @@
             android:id="@+id/changeSpotButton"
             android:background="@drawable/button_corners"
             android:layout_height="wrap_content"
-            android:layout_width="fill_parent"
-            android:layout_margin="10dp"
-            android:layout_weight="1"/>
+            android:layout_width="wrap_content"
+            android:layout_marginRight="10dp"
+            android:layout_margin="10dp" />
     </LinearLayout>
 
     <ImageView
@@ -130,7 +131,6 @@
         android:layout_height="150dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_marginLeft="0dp"
         android:layout_marginBottom="0dp"
         android:scaleType="fitStart" />
 
