@@ -1,18 +1,18 @@
 <resources>
-    <string name="app_name">OnePoundSteakProject</string>
+    <string name="app_name">うしのおとも</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="hint2_label">時間を入力してください(分)</string>
-    <string name="hint1_label">お金を入力してください(円)</string>
-    <string name="string_text">暇な時間をあなたに...\nお金か時間を入力してください.どちらかでもOK!\n(GPS機能をONにしてください)</string>
-    <string name="button_label">この情報で送信！</string>
+    <string name="hint2_label">時間を入力してモ〜(分)</string>
+    <string name="hint1_label">お金を入力してモ〜(円)</string>
+    <string name="string_text">時間が余ったのかモ？\nお金か時間を入力してモ〜.\nどちらかだけでもOKだモ〜！</string>
+    <string name="button_label">この条件で探してきて〜</string>
     <string name="title_activity_output_main">Output</string>
     <string name="title_activity_map">MapActivity</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_test">test</string>
     <string name="title_activity_view">ViewActivity</string>
 
-<!-- TODO: Remove or change this placeholder text -->
+    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

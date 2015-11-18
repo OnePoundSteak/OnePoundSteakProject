@@ -1,0 +1,147 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="honda.onepoundsteakproject.InputFragment"
+    android:background="#FFD85A">
+
+
+    <TextView
+        android:id = "@+id/mainback"
+        android:gravity="center"
+        android:background="@drawable/corner_round"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/cow"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="0dp"/>
+
+    <TextView
+        android:id = "@+id/inputSuggest"
+        android:gravity="center"
+        android:textSize="15sp"
+        android:text="@string/string_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#333333"
+        android:layout_marginTop="35dp"
+        android:layout_alignTop="@+id/mainback"
+        android:layout_centerHorizontal="true" />
+
+    <LinearLayout
+        android:id = "@+id/inputMoney"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@+id/inputSuggest"
+        android:layout_marginTop="35dp"
+        android:layout_alignStart="@+id/mainback"
+        android:baselineAligned="true"
+        android:gravity="center">
+        <Spinner
+            android:id="@+id/spinner3"
+            android:layout_marginLeft="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="#FFD85A"
+            android:drawSelectorOnTop="true"
+            android:text="Spinner1"
+            android:clickable="true"
+            android:gravity="center"></Spinner>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="15dp"
+            android:gravity="center"
+            android:text="円以内"></TextView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id = "@+id/inputTime"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@+id/inputMoney"
+        android:layout_marginTop="35dp"
+        android:layout_alignStart="@+id/mainback"
+        android:gravity="center">
+        <Spinner
+            android:id="@+id/spinner1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:background="#FFD85A"
+            android:layout_gravity="center"
+            android:drawSelectorOnTop="true"
+            android:gravity="center"
+            android:text="Spinner1"></Spinner>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="時間"></TextView>
+
+        <Spinner
+            android:id="@+id/spinner2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#FFD85A"
+            android:layout_gravity="center"
+            android:drawSelectorOnTop="true"
+            android:gravity="center"
+            android:text="Spinner"></Spinner>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="15dp"
+            android:gravity="center"
+            android:text="分以内" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/message"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp" />
+
+    <Button
+        android:layout_below="@+id/inputTime"
+        android:id="@+id/sendButton"
+        android:hint="@string/button_label"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="45dp"
+        android:layout_marginLeft="45dp"
+        android:layout_marginRight="45dp"
+        android:layout_width="fill_parent"
+        android:layout_weight="1"
+        android:background="#FFD85A" />
+
+    <ImageView
+        android:id="@+id/cow"
+        android:src="@drawable/cow2"
+        android:layout_width="wrap_content"
+        android:layout_height="150dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="0dp"
+        android:layout_marginBottom="0dp"
+        android:scaleType="fitStart" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:longClickable="false"
+        android:nestedScrollingEnabled="false"
+        android:layout_alignTop="@+id/inputSuggest"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="324dp"></RelativeLayout>
+</RelativeLayout>

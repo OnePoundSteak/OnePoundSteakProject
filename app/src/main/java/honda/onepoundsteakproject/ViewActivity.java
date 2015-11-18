@@ -29,13 +29,14 @@ public class ViewActivity extends FragmentActivity {
 
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.contents);
         if(fragment == null){
-            fragment = new PreviewActivityFragment();
-            Bundle args = new Bundle();
-            args.putInt("money", money);
-            args.putInt("time", time);
-            args.putDouble("lon", longitude);
-            args.putDouble("lat", latitude);
-            fragment.setArguments(args);
+            fragment = new InputFragment();
+//            fragment = new PreviewActivityFragment();
+//            Bundle args = new Bundle();
+//            args.putInt("money", money);
+//            args.putInt("time", time);
+//            args.putDouble("lon", longitude);
+//            args.putDouble("lat", latitude);
+//            fragment.setArguments(args);
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.add(R.id.contents, fragment);
             fragmentTransaction.commit();
