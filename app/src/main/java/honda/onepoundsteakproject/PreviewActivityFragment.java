@@ -1,13 +1,11 @@
 package honda.onepoundsteakproject;
 
-
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,10 +31,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Timer;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -57,7 +52,6 @@ public class PreviewActivityFragment extends Fragment {
     private TextView mSpotNameTextView;
     private TextView mSpotTimeTextView;
     private TextView mSpotFareTextView;
-    private ProgressDialog mpDialog;
     private NetworkImageView mSpotImageView;
 
     private Boolean mSpotListLoaded;
@@ -65,6 +59,7 @@ public class PreviewActivityFragment extends Fragment {
     private Boolean mImageURLLoaded;
     private long mStartTime;
 
+    private MyDialog mLoadingDialog;
 
     public PreviewActivityFragment() {
     }
@@ -84,16 +79,10 @@ public class PreviewActivityFragment extends Fragment {
                 getArguments().getDouble("lat"),
                 getArguments().getInt("money"),
                 getArguments().getInt("time"));
-        mpDialog = new ProgressDialog(getActivity());
-        mpDialog.setCancelable(false);
-        mpDialog.setMessage("検索中です...");
-        mpDialog.show();
         mSpotListLoaded = false;
         mRouteListLoaded = false;
         mImageURLLoaded = false;
         mStartTime = System.currentTimeMillis();
-
-        spotListRequest(mUserInf.lon, mUserInf.lat, mUserInf.time);
     }
 
     @Override
@@ -109,22 +98,14 @@ public class PreviewActivityFragment extends Fragment {
         view.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Fragment fragment = new ViewActivityFragment();
-                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.contents, fragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-
-                /*
-                GoogleMapとの連携
-                 */
-                try{
+                // GoogleMapとの連携
+                try {
                     Uri uri = Uri.parse(
                             "geo:0.0?q=" + mSelectSpotInf.lat + "," + mSelectSpotInf.lon
                     );
                     Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                     startActivity(intent);
-                }catch (ActivityNotFoundException e){
+                } catch (ActivityNotFoundException e) {
                     //アプリがなかったときのエラー処理
                     Toast.makeText(getActivity(), "画像がないです", Toast.LENGTH_LONG).show();
                 }
@@ -155,6 +136,17 @@ public class PreviewActivityFragment extends Fragment {
             }
         });
 
+        return view;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle bundle) {
+        super.onActivityCreated(bundle);
+
+        mLoadingDialog = new MyDialog(getActivity(), "検索中です...");
+
+        spotListRequest(mUserInf.lon, mUserInf.lat, mUserInf.time);
+
         if (mSelectSpotInf != null) {
             mSpotNameTextView.setText(mSelectSpotInf.name);
             mSpotTimeTextView.setText(mSelectSpotInf.duration + "分");
@@ -165,16 +157,14 @@ public class PreviewActivityFragment extends Fragment {
                 mSpotImageView.setImageUrl(mSelectSpotInf.imageURL, new ImageLoader(AppController.getInstance().getRequestQueue(), new BitmapCache()));
             }
         }
-        return view;
     }
-
 
     private void spotListRequest(double lon, double lat, float time) {
         String tag_json_obj = "json_obj_req";
         String url = "https://gentle-basin-2840.herokuapp.com/place/" + lat + "/" + lon + "/" + time;
         Log.d("Access URL:", url);
         // ロード中表示
-        mpDialog.show();
+        mLoadingDialog.show();
 
         JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
                 url, null,
@@ -204,14 +194,14 @@ public class PreviewActivityFragment extends Fragment {
 
                         mSpotListLoaded = true;
                         if (mSpotListLoaded && mRouteListLoaded && mImageURLLoaded) {
-                            mpDialog.hide();
+                            mLoadingDialog.hide();
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.d(TAG, "Error: " + error.getMessage());
-                mpDialog.hide(); // TODO ここもしっかり書き分けるべき
+                mLoadingDialog.hide(); // TODO ここもしっかり書き分けるべき
 
                 if (error instanceof NetworkError) {
                 } else if (error instanceof ServerError) {
@@ -233,7 +223,8 @@ public class PreviewActivityFragment extends Fragment {
                 "origin=" + orgLat + "," + orgLon +
                 "&destination=" + destLat + "," + destLon +
                 "&key=" + API_KEY +
-                "&mode=transit&alternatives=true" +
+                "&mode=transit|walking" +
+                "&alternatives=true" +
                 "&avoid=tolls|highways|ferries" +
                 "&language=ja" +
                 "&units=metric" +
@@ -241,7 +232,7 @@ public class PreviewActivityFragment extends Fragment {
         Log.d("Access URL:", url);
 
         // ロード中表示
-        mpDialog.show();
+        mLoadingDialog.show();
 
         JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
                 url, null,
@@ -253,7 +244,7 @@ public class PreviewActivityFragment extends Fragment {
 
                         mSelectSpotInf.fare = routeList.get(0).fare;
                         mSelectSpotInf.duration = routeList.get(0).duration;
-                        // TODO
+                        // TODO 最低金額、最低料金にしている。治すべき
                         for(int i=1; i<routeList.size(); i++){
                             if(mSelectSpotInf.fare > routeList.get(i).fare){
                                 mSelectSpotInf.fare = routeList.get(i).fare;
@@ -272,7 +263,6 @@ public class PreviewActivityFragment extends Fragment {
                                 mSpotList.remove(0);
                                 // 再度、検索をかける
                                 routeListRequest(mUserInf.lon, mUserInf.lat, mSelectSpotInf.lon, mSelectSpotInf.lat);
-
                             }else{
                                 // みつかりませんでした
                                 mSpotNameTextView.setText("ごめんなさい。見つかりませんでした。");
@@ -283,12 +273,16 @@ public class PreviewActivityFragment extends Fragment {
                             }
                         }else{
                             // 条件を満たしている
-                            mSpotNameTextView.setText(mSelectSpotInf.name);
+                            if (mSelectSpotInf.name.length() > 10) {
+                                mSpotNameTextView.setText(mSelectSpotInf.name.substring(0, 10) + "...");
+                            }else{
+                                mSpotNameTextView.setText(mSelectSpotInf.name);
+                            }
                             mSpotFareTextView.setText(mSelectSpotInf.fare + "円");
                             mSpotTimeTextView.setText(mSelectSpotInf.duration + "分");
                             imgURLRequest(mSelectSpotInf.name);
                             if (mSpotListLoaded && mRouteListLoaded && mImageURLLoaded) {
-                                mpDialog.hide();
+                                mLoadingDialog.hide();
                             }
                         }
 
@@ -297,7 +291,7 @@ public class PreviewActivityFragment extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.d(TAG, "Error: " + error.getMessage());
-                mpDialog.hide(); // TODO ここもしっかり書き分けるべき
+                mLoadingDialog.hide(); // TODO ここもしっかり書き分けるべき
 
                 if (error instanceof NetworkError) {
                 } else if (error instanceof ServerError) {
@@ -314,6 +308,8 @@ public class PreviewActivityFragment extends Fragment {
     }
 
     private void imgURLRequest(String keyword) {
+        keyword = keyword.replace(" ", "%20");
+        keyword = keyword.replace("　", "%20");
         String tag_json_obj = "imgSearch_obj_req";
         String url = "https://www.googleapis.com/customsearch/v1?"
                 + "key=" + API_KEY
@@ -325,7 +321,7 @@ public class PreviewActivityFragment extends Fragment {
         Log.d("Access URL:", url);
 
         // ロード中表示
-        mpDialog.show();
+        mLoadingDialog.show();
 
         JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
                 url, null,
@@ -345,14 +341,14 @@ public class PreviewActivityFragment extends Fragment {
                         mImageURLLoaded = true;
 
                         if (mSpotListLoaded && mRouteListLoaded && mImageURLLoaded) {
-                            mpDialog.hide();
+                            mLoadingDialog.hide();
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.d(TAG, "Error: " + error.getMessage());
-                mpDialog.hide(); // TODO ここもしっかり書き分けるべき
+                mLoadingDialog.hide(); // TODO ここもしっかり書き分けるべき
 
                 if (error instanceof NetworkError) {
                 } else if (error instanceof ServerError) {
