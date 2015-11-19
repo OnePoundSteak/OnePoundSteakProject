@@ -1,6 +1,5 @@
 package honda.onepoundsteakproject;
 
-
 import android.Manifest;
 import android.app.Activity;
 import android.app.Service;
@@ -8,17 +7,14 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.app.Fragment;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -31,7 +27,6 @@ public class InputFragment extends Fragment {
     public final static String EXTRA_MYMONEY = "honda.onepoundsteakproject.MYMONEY";
     public final static String EXTRA_MYLONGITUDE = "honda.onepoundsteakproject.MYLONGITUDE";
     public final static String EXTRA_MYLAITUDE = "honda.onepoundsteakproject.MYLAITUDE";
-    private static final String TAG = InputMain.class.getSimpleName();
     private static final int LOCATION_UPDATE_MIN_TIME = 0;
     private static final int LOCATION_UPDATE_MIN_DISTANCE = 1;
     private LocationManager mLocationManager;
@@ -70,7 +65,6 @@ public class InputFragment extends Fragment {
                         public void onLocationChanged(Location location) {
                             mLatitude = location.getLatitude();
                             mLongitude = location.getLongitude();
-                            Log.d(TAG, ""+mLatitude+","+mLongitude);
                         }
 
                         @Override
@@ -101,7 +95,6 @@ public class InputFragment extends Fragment {
             public void onClick(View v){
                 Toast.makeText(activity, "ボタンが押されました！", Toast.LENGTH_LONG).show();
                 int time = time1*60+time2;
-                Log.d(TAG, "onClick "+ time + "," + mMoney );
                 Fragment fragment = new PreviewActivityFragment();
                 Bundle args = new Bundle();
                 args.putInt("money", mMoney);

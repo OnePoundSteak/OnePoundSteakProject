@@ -109,12 +109,6 @@ public class PreviewActivityFragment extends Fragment {
         view.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Fragment fragment = new ViewActivityFragment();
-                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.contents, fragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-
                 /*
                 GoogleMapとの連携
                  */
@@ -253,7 +247,7 @@ public class PreviewActivityFragment extends Fragment {
 
                         mSelectSpotInf.fare = routeList.get(0).fare;
                         mSelectSpotInf.duration = routeList.get(0).duration;
-                        // TODO
+                        // TODO 最低金額、最低料金にしている。治すべき
                         for(int i=1; i<routeList.size(); i++){
                             if(mSelectSpotInf.fare > routeList.get(i).fare){
                                 mSelectSpotInf.fare = routeList.get(i).fare;
@@ -272,7 +266,6 @@ public class PreviewActivityFragment extends Fragment {
                                 mSpotList.remove(0);
                                 // 再度、検索をかける
                                 routeListRequest(mUserInf.lon, mUserInf.lat, mSelectSpotInf.lon, mSelectSpotInf.lat);
-
                             }else{
                                 // みつかりませんでした
                                 mSpotNameTextView.setText("ごめんなさい。見つかりませんでした。");
@@ -314,6 +307,7 @@ public class PreviewActivityFragment extends Fragment {
     }
 
     private void imgURLRequest(String keyword) {
+        keyword = keyword.replace(" ", "%20");
         String tag_json_obj = "imgSearch_obj_req";
         String url = "https://www.googleapis.com/customsearch/v1?"
                 + "key=" + API_KEY
