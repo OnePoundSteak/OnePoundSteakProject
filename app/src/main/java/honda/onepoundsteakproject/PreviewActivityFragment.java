@@ -1,13 +1,11 @@
 package honda.onepoundsteakproject;
 
-
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,10 +31,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Timer;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -112,13 +107,13 @@ public class PreviewActivityFragment extends Fragment {
                 /*
                 GoogleMapとの連携
                  */
-                try{
+                try {
                     Uri uri = Uri.parse(
                             "geo:0.0?q=" + mSelectSpotInf.lat + "," + mSelectSpotInf.lon
                     );
                     Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                     startActivity(intent);
-                }catch (ActivityNotFoundException e){
+                } catch (ActivityNotFoundException e) {
                     //アプリがなかったときのエラー処理
                     Toast.makeText(getActivity(), "画像がないです", Toast.LENGTH_LONG).show();
                 }
@@ -276,7 +271,11 @@ public class PreviewActivityFragment extends Fragment {
                             }
                         }else{
                             // 条件を満たしている
-                            mSpotNameTextView.setText(mSelectSpotInf.name);
+                            if (mSelectSpotInf.name.length() > 10) {
+                                mSpotNameTextView.setText(mSelectSpotInf.name.substring(0, 10) + "...");
+                            }else{
+                                mSpotNameTextView.setText(mSelectSpotInf.name);
+                            }
                             mSpotFareTextView.setText(mSelectSpotInf.fare + "円");
                             mSpotTimeTextView.setText(mSelectSpotInf.duration + "分");
                             imgURLRequest(mSelectSpotInf.name);
@@ -308,6 +307,7 @@ public class PreviewActivityFragment extends Fragment {
 
     private void imgURLRequest(String keyword) {
         keyword = keyword.replace(" ", "%20");
+        keyword = keyword.replace("　", "%20");
         String tag_json_obj = "imgSearch_obj_req";
         String url = "https://www.googleapis.com/customsearch/v1?"
                 + "key=" + API_KEY
