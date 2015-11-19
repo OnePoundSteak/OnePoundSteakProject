@@ -20,12 +20,14 @@ public class MyDialog {
     public void show(){
         if (!mVisibleFlag) {
             mDialog.show();
+            mVisibleFlag = true;
         }
     }
 
     public void hide(){
         if (mVisibleFlag) {
             mDialog.hide();
+            mVisibleFlag = false;
         }
     }
 }

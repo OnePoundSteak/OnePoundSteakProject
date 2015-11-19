@@ -52,7 +52,6 @@ public class PreviewActivityFragment extends Fragment {
     private TextView mSpotNameTextView;
     private TextView mSpotTimeTextView;
     private TextView mSpotFareTextView;
-    private ProgressDialog mpDialog;
     private NetworkImageView mSpotImageView;
 
     private Boolean mSpotListLoaded;
@@ -60,6 +59,7 @@ public class PreviewActivityFragment extends Fragment {
     private Boolean mImageURLLoaded;
     private long mStartTime;
 
+    private MyDialog mLoadingDialog;
 
     public PreviewActivityFragment() {
     }
@@ -79,16 +79,10 @@ public class PreviewActivityFragment extends Fragment {
                 getArguments().getDouble("lat"),
                 getArguments().getInt("money"),
                 getArguments().getInt("time"));
-        mpDialog = new ProgressDialog(getActivity());
-        mpDialog.setCancelable(false);
-        mpDialog.setMessage("検索中です...");
-        mpDialog.show();
         mSpotListLoaded = false;
         mRouteListLoaded = false;
         mImageURLLoaded = false;
         mStartTime = System.currentTimeMillis();
-
-        spotListRequest(mUserInf.lon, mUserInf.lat, mUserInf.time);
     }
 
     @Override
@@ -104,9 +98,7 @@ public class PreviewActivityFragment extends Fragment {
         view.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*
-                GoogleMapとの連携
-                 */
+                // GoogleMapとの連携
                 try {
                     Uri uri = Uri.parse(
                             "geo:0.0?q=" + mSelectSpotInf.lat + "," + mSelectSpotInf.lon
@@ -144,6 +136,17 @@ public class PreviewActivityFragment extends Fragment {
             }
         });
 
+        return view;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle bundle) {
+        super.onActivityCreated(bundle);
+
+        mLoadingDialog = new MyDialog(getActivity(), "検索中です...");
+
+        spotListRequest(mUserInf.lon, mUserInf.lat, mUserInf.time);
+
         if (mSelectSpotInf != null) {
             mSpotNameTextView.setText(mSelectSpotInf.name);
             mSpotTimeTextView.setText(mSelectSpotInf.duration + "分");
@@ -154,16 +157,14 @@ public class PreviewActivityFragment extends Fragment {
                 mSpotImageView.setImageUrl(mSelectSpotInf.imageURL, new ImageLoader(AppController.getInstance().getRequestQueue(), new BitmapCache()));
             }
         }
-        return view;
     }
-
 
     private void spotListRequest(double lon, double lat, float time) {
         String tag_json_obj = "json_obj_req";
         String url = "https://gentle-basin-2840.herokuapp.com/place/" + lat + "/" + lon + "/" + time;
         Log.d("Access URL:", url);
         // ロード中表示
-        mpDialog.show();
+        mLoadingDialog.show();
 
         JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
                 url, null,
@@ -193,14 +194,14 @@ public class PreviewActivityFragment extends Fragment {
 
                         mSpotListLoaded = true;
                         if (mSpotListLoaded && mRouteListLoaded && mImageURLLoaded) {
-                            mpDialog.hide();
+                            mLoadingDialog.hide();
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.d(TAG, "Error: " + error.getMessage());
-                mpDialog.hide(); // TODO ここもしっかり書き分けるべき
+                mLoadingDialog.hide(); // TODO ここもしっかり書き分けるべき
 
                 if (error instanceof NetworkError) {
                 } else if (error instanceof ServerError) {
@@ -222,7 +223,8 @@ public class PreviewActivityFragment extends Fragment {
                 "origin=" + orgLat + "," + orgLon +
                 "&destination=" + destLat + "," + destLon +
                 "&key=" + API_KEY +
-                "&mode=transit&alternatives=true" +
+                "&mode=transit|walking" +
+                "&alternatives=true" +
                 "&avoid=tolls|highways|ferries" +
                 "&language=ja" +
                 "&units=metric" +
@@ -230,7 +232,7 @@ public class PreviewActivityFragment extends Fragment {
         Log.d("Access URL:", url);
 
         // ロード中表示
-        mpDialog.show();
+        mLoadingDialog.show();
 
         JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
                 url, null,
@@ -280,7 +282,7 @@ public class PreviewActivityFragment extends Fragment {
                             mSpotTimeTextView.setText(mSelectSpotInf.duration + "分");
                             imgURLRequest(mSelectSpotInf.name);
                             if (mSpotListLoaded && mRouteListLoaded && mImageURLLoaded) {
-                                mpDialog.hide();
+                                mLoadingDialog.hide();
                             }
                         }
 
@@ -289,7 +291,7 @@ public class PreviewActivityFragment extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.d(TAG, "Error: " + error.getMessage());
-                mpDialog.hide(); // TODO ここもしっかり書き分けるべき
+                mLoadingDialog.hide(); // TODO ここもしっかり書き分けるべき
 
                 if (error instanceof NetworkError) {
                 } else if (error instanceof ServerError) {
@@ -319,7 +321,7 @@ public class PreviewActivityFragment extends Fragment {
         Log.d("Access URL:", url);
 
         // ロード中表示
-        mpDialog.show();
+        mLoadingDialog.show();
 
         JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
                 url, null,
@@ -339,14 +341,14 @@ public class PreviewActivityFragment extends Fragment {
                         mImageURLLoaded = true;
 
                         if (mSpotListLoaded && mRouteListLoaded && mImageURLLoaded) {
-                            mpDialog.hide();
+                            mLoadingDialog.hide();
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.d(TAG, "Error: " + error.getMessage());
-                mpDialog.hide(); // TODO ここもしっかり書き分けるべき
+                mLoadingDialog.hide(); // TODO ここもしっかり書き分けるべき
 
                 if (error instanceof NetworkError) {
                 } else if (error instanceof ServerError) {
