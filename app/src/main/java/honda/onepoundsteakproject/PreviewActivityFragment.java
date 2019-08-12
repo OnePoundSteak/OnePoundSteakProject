@@ -38,7 +38,7 @@ import java.util.ArrayList;
  */
 public class PreviewActivityFragment extends Fragment {
     private static final String TAG = PreviewActivityFragment.class.getSimpleName();
-    private String API_KEY = "AIzaSyBV6AkKjK5ZUYbU-ntP5-qKhSJMVuSJufY";
+    private String API_KEY = "";
 
     private UserInf mUserInf;
 
